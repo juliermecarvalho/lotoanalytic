@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="720" viewBox="0 0 920 720" role="img" aria-labelledby="title desc">
+  <title id="title">Previa do painel LotoAnalytics</title>
+  <desc id="desc">Interface com metricas, grafico de frequencia e lista de jogos filtrados.</desc>
+  <rect width="920" height="720" rx="28" fill="#17221f"/>
+  <rect x="34" y="34" width="852" height="652" rx="18" fill="#f8faf7"/>
+  <rect x="34" y="34" width="852" height="84" rx="18" fill="#ffffff"/>
+  <circle cx="78" cy="76" r="20" fill="#1f7a4d"/>
+  <text x="68" y="82" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#ffffff">LA</text>
+  <text x="112" y="83" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#17221f">LotoAnalytics</text>
+  <rect x="640" y="58" width="180" height="36" rx="8" fill="#1f7a4d"/>
+  <text x="682" y="82" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#ffffff">Gerar jogos</text>
+  <rect x="68" y="156" width="226" height="128" rx="10" fill="#eaf1ed"/>
+  <rect x="320" y="156" width="226" height="128" rx="10" fill="#f7ecd0"/>
+  <rect x="572" y="156" width="226" height="128" rx="10" fill="#e9eef8"/>
+  <text x="94" y="200" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#17221f">Frequencia</text>
+  <text x="94" y="246" font-family="Arial, sans-serif" font-size="44" font-weight="700" fill="#1f7a4d">25</text>
+  <text x="346" y="200" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#17221f">Faixa de soma</text>
+  <text x="346" y="246" font-family="Arial, sans-serif" font-size="44" font-weight="700" fill="#d89614">170</text>
+  <text x="598" y="200" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#17221f">Jogos prontos</text>
+  <text x="598" y="246" font-family="Arial, sans-serif" font-size="44" font-weight="700" fill="#2457a6">50</text>
+  <rect x="68" y="324" width="478" height="292" rx="12" fill="#ffffff" stroke="#d9ded7"/>
+  <text x="94" y="366" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#17221f">Frequencia recente</text>
+  <rect x="94" y="552" width="34" height="36" rx="5" fill="#1f7a4d"/>
+  <rect x="144" y="512" width="34" height="76" rx="5" fill="#2457a6"/>
+  <rect x="194" y="458" width="34" height="130" rx="5" fill="#d89614"/>
+  <rect x="244" y="488" width="34" height="100" rx="5" fill="#1f7a4d"/>
+  <rect x="294" y="414" width="34" height="174" rx="5" fill="#b8473d"/>
+  <rect x="344" y="470" width="34" height="118" rx="5" fill="#2457a6"/>
+  <rect x="394" y="438" width="34" height="150" rx="5" fill="#1f7a4d"/>
+  <rect x="444" y="398" width="34" height="190" rx="5" fill="#d89614"/>
+  <rect x="572" y="324" width="226" height="292" rx="12" fill="#12211b"/>
+  <text x="598" y="366" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#ffffff">Jogos filtrados</text>
+  <text x="598" y="414" font-family="Consolas, monospace" font-size="17" fill="#e8f5ed">01 03 04 06 08</text>
+  <text x="598" y="446" font-family="Consolas, monospace" font-size="17" fill="#e8f5ed">09 11 13 15 16</text>
+  <text x="598" y="478" font-family="Consolas, monospace" font-size="17" fill="#e8f5ed">18 20 22 23 25</text>
+  <line x1="598" y1="512" x2="764" y2="512" stroke="#355148" stroke-width="2"/>
+  <text x="598" y="552" font-family="Arial, sans-serif" font-size="15" fill="#b8c8c0">Pares: 7 | Soma: 174</text>
+  <text x="598" y="580" font-family="Arial, sans-serif" font-size="15" fill="#b8c8c0">Repetidas: 9</text>
+</svg>

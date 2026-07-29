@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/apps/" />
+  <Folder Name="/apps/api/" />
+  <Folder Name="/apps/api/src/">
+    <Project Path="apps/api/src/LotoAnalytics.Api/LotoAnalytics.Api.csproj" />
+  </Folder>
+  <Folder Name="/apps/api/tests/" />
+  <Folder Name="/apps/api/tests/Integration/">
+    <Project Path="apps/api/tests/Integration/LotoAnalytics.Api.IntegrationTests.csproj" />
+  </Folder>
+  <Folder Name="/apps/api/tests/Unit/">
+    <Project Path="apps/api/tests/Unit/LotoAnalytics.Api.UnitTests.csproj" />
+  </Folder>
+</Solution>
