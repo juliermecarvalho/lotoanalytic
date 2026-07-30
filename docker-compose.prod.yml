@@ -1,0 +1,143 @@
+# docker-compose.prod.yml
+# Deploy de producao via Dokploy (Traefik + Let's Encrypt).
+# Sobe sobre a estrutura raiz do repo (apps/, keycloak/ na raiz).
+#
+# Variaveis (definir no painel do Dokploy, aba Environment do servico Compose):
+#   POSTGRES_PASSWORD, KEYCLOAK_ADMIN_PASSWORD
+#
+# Dominios (Traefik do Dokploy roteia por Host):
+#   app.lotoanalytic.com.br  -> web
+#   api.lotoanalytic.com.br  -> api
+#   auth.lotoanalytic.com.br -> keycloak
+#
+# VERIFICAR no primeiro deploy:
+#   - Nome do certresolver do Traefik do Dokploy (abaixo usamos "letsencrypt").
+#   - Keycloak em modo producao atras do proxy (KC_HOSTNAME/KC_PROXY_HEADERS).
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: lotoanalytics
+      POSTGRES_USER: lotoanalytics
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lotoanalytics -d lotoanalytics"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  postgres-init:
+    image: postgres:17-alpine
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    command:
+      [
+        "sh",
+        "-c",
+        "psql -h postgres -U lotoanalytics -d postgres -tc \"SELECT 1 FROM pg_database WHERE datname = 'lotoanalytics_keycloak'\" | grep -q 1 || psql -h postgres -U lotoanalytics -d postgres -c \"CREATE DATABASE lotoanalytics_keycloak OWNER lotoanalytics\""
+      ]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [internal]
+    restart: "no"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.3.3
+    command: ["start", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_DB: postgres
+      KC_DB_URL_HOST: postgres
+      KC_DB_URL_PORT: "5432"
+      KC_DB_URL_DATABASE: lotoanalytics_keycloak
+      KC_DB_USERNAME: lotoanalytics
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KC_HOSTNAME: https://auth.lotoanalytic.com.br
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+      KC_HEALTH_ENABLED: "true"
+    volumes:
+      - ./keycloak/import:/opt/keycloak/data/import:ro
+      - ./keycloak/themes:/opt/keycloak/themes:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      postgres-init:
+        condition: service_completed_successfully
+    networks: [internal, dokploy-network]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.loto-auth.rule=Host(`auth.lotoanalytic.com.br`)
+      - traefik.http.routers.loto-auth.entrypoints=websecure
+      - traefik.http.routers.loto-auth.tls.certresolver=letsencrypt
+      - traefik.http.services.loto-auth.loadbalancer.server.port=8080
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=lotoanalytics;Username=lotoanalytics;Password=${POSTGRES_PASSWORD}
+      Keycloak__Authority: https://auth.lotoanalytic.com.br/realms/lotoanalytics
+      Keycloak__MetadataAddress: http://keycloak:8080/realms/lotoanalytics/.well-known/openid-configuration
+      Keycloak__Audience: lotoanalytics-api
+      Keycloak__RequireHttpsMetadata: "false"
+      ContestUpdates__Enabled: "true"
+      ContestUpdates__RunOnStartup: "true"
+      ContestUpdates__DailyRunAt: "01:00:00"
+      ContestUpdates__TimeZoneId: "America/Sao_Paulo"
+      ContestUpdates__DelayMilliseconds: "200"
+      ContestUpdates__ErrorDelayMilliseconds: "300000"
+      ContestUpdates__MaxRetryAttempts: "3"
+      Cors__AllowedOrigins__0: https://app.lotoanalytic.com.br
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [internal, dokploy-network]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.loto-api.rule=Host(`api.lotoanalytic.com.br`)
+      - traefik.http.routers.loto-api.entrypoints=websecure
+      - traefik.http.routers.loto-api.tls.certresolver=letsencrypt
+      - traefik.http.services.loto-api.loadbalancer.server.port=8080
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: https://api.lotoanalytic.com.br
+        VITE_KEYCLOAK_AUTHORITY: https://auth.lotoanalytic.com.br/realms/lotoanalytics
+        VITE_KEYCLOAK_CLIENT_ID: lotoanalytics-web
+    depends_on:
+      - api
+    networks: [dokploy-network]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.loto-web.rule=Host(`app.lotoanalytic.com.br`)
+      - traefik.http.routers.loto-web.entrypoints=websecure
+      - traefik.http.routers.loto-web.tls.certresolver=letsencrypt
+      - traefik.http.services.loto-web.loadbalancer.server.port=80
+    restart: unless-stopped
+
+networks:
+  internal:
+  dokploy-network:
+    external: true
+
+volumes:
+  postgres-data:
