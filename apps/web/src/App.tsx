@@ -35,6 +35,7 @@ import {
 import { AppState, AppStateContext, useAppState } from "./lib/appState";
 import { AuthService, AuthSession, keycloakAuthService } from "./lib/auth";
 import { GeneratorPage } from "./features/generator/GeneratorPage";
+import { PrivacyPolicyPage } from "./features/legal/PrivacyPolicyPage";
 import "./styles.css";
 
 const defaultState: AppState = {
@@ -149,6 +150,11 @@ function createAppRouter() {
     path: "/auth/callback",
     component: AuthCallbackPage
   });
+  const privacyRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/privacidade",
+    component: PrivacyPolicyPage
+  });
   const routeTree = rootRoute.addChildren([
     dashboardRoute,
     generatorRoute,
@@ -161,7 +167,8 @@ function createAppRouter() {
     adminContestUpdateRoute,
     adminLoginRoute,
     detailedStatisticsRoute,
-    callbackRoute
+    callbackRoute,
+    privacyRoute
   ]);
 
   return createRouter({ routeTree });
@@ -242,6 +249,9 @@ function Shell() {
           </div>
         </section>
         <Outlet />
+        <footer className="app-footer">
+          <Link to="/privacidade">Política de Privacidade</Link>
+        </footer>
       </main>
     </div>
   );
