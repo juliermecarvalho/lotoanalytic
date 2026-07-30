@@ -122,6 +122,14 @@ services:
         VITE_API_BASE_URL: https://api.lotoanalytic.com.br
         VITE_KEYCLOAK_AUTHORITY: https://auth.lotoanalytic.com.br/realms/lotoanalytics
         VITE_KEYCLOAK_CLIENT_ID: lotoanalytics-web
+        VITE_ADSENSE_CLIENT: ca-pub-1547523206412793
+        # Slots dos blocos de anuncio: preencher na aba Environment do Dokploy
+        # conforme as unidades forem criadas no painel do AdSense.
+        VITE_ADSENSE_SLOT_LEADERBOARD: ${VITE_ADSENSE_SLOT_LEADERBOARD:-}
+        VITE_ADSENSE_SLOT_RECTANGLE: ${VITE_ADSENSE_SLOT_RECTANGLE:-}
+        VITE_ADSENSE_SLOT_HALF_PAGE: ${VITE_ADSENSE_SLOT_HALF_PAGE:-}
+        VITE_ADSENSE_SLOT_SIDEBAR_EXTRA: ${VITE_ADSENSE_SLOT_SIDEBAR_EXTRA:-}
+        VITE_ADSENSE_SLOT_RESPONSIVE: ${VITE_ADSENSE_SLOT_RESPONSIVE:-}
     depends_on:
       - api
     networks: [dokploy-network]
