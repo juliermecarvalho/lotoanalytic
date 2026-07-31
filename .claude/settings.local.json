@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(du -sh \"//wsl.localhost/Ubuntu/home/julierme/repo/lotoanalytic/bd\"/*)"
+      "Bash(du -sh \"//wsl.localhost/Ubuntu/home/julierme/repo/lotoanalytic/bd\"/*)",
+      "PowerShell(wsl -d Ubuntu -- bash -lc \"cd ~/repo/lotoanalytic && source ~/.bashrc && parse_git_branch && echo '' && file ~/.bashrc\")",
+      "PowerShell(wsl -d Ubuntu -- bash -ic \"cd ~/repo/lotoanalytic && parse_git_branch; echo; echo \\\\\"PS1 renderizado: \\\\$\\(cd ~/repo/lotoanalytic && parse_git_branch\\)\\\\\"; file ~/.bashrc\")",
+      "PowerShell(wsl -d Ubuntu -- file ~/.bashrc; wsl -d Ubuntu -- tail -n 20 ~/.bashrc)",
+      "PowerShell(wsl -d Ubuntu -- bash -c 'file $HOME/.bashrc; tail -n 18 $HOME/.bashrc')"
     ]
   }
 }
