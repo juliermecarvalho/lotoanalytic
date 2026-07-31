@@ -100,6 +100,16 @@ services:
       ContestUpdates__DelayMilliseconds: "200"
       ContestUpdates__ErrorDelayMilliseconds: "300000"
       ContestUpdates__MaxRetryAttempts: "3"
+      # O CDN da Caixa bloqueia requisicoes vindas deste servidor (Alemanha). Habilite os proxies
+      # com `bash scripts/find-caixa-proxies.sh 40` e cole as variaveis Caixa__Proxy__Addresses__N
+      # geradas, ou aponte Caixa__BaseUrl para um relay hospedado no Brasil.
+      Caixa__BaseUrl: ${CAIXA_BASE_URL:-https://servicebus3.caixa.gov.br/portaldeloterias/api}
+      Caixa__Proxy__Enabled: ${CAIXA_PROXY_ENABLED:-false}
+      Caixa__Proxy__AddressList: ${CAIXA_PROXY_ADDRESSES:-}
+      Caixa__Proxy__TimeoutSeconds: ${CAIXA_PROXY_TIMEOUT_SECONDS:-15}
+      Caixa__Proxy__FailureCooldownSeconds: ${CAIXA_PROXY_COOLDOWN_SECONDS:-120}
+      Caixa__Proxy__Username: ${CAIXA_PROXY_USERNAME:-}
+      Caixa__Proxy__Password: ${CAIXA_PROXY_PASSWORD:-}
       Cors__AllowedOrigins__0: https://app.lotoanalytic.com.br
       Cors__AllowedOrigins__1: https://lotoanalytic.com.br
     depends_on:

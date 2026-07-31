@@ -1,3 +1,6 @@
+using System.Net;
+using Microsoft.Extensions.Options;
+
 namespace LotoAnalytics.Api.Features.Contests;
 
 public interface ICaixaLotteryClient
@@ -5,20 +8,92 @@ public interface ICaixaLotteryClient
     Task<string> GetContestResultJsonAsync(string lotteryModeCode, int contestNumber, CancellationToken cancellationToken);
 }
 
-public sealed class CaixaLotteryClient(HttpClient httpClient) : ICaixaLotteryClient
+public sealed class CaixaLotteryClient(
+    IHttpClientFactory httpClientFactory,
+    CaixaProxyRegistry proxyRegistry,
+    IOptions<CaixaLotteryOptions> options,
+    TimeProvider timeProvider,
+    ILogger<CaixaLotteryClient> logger) : ICaixaLotteryClient
 {
-    // Busca o JSON bruto de um concurso na API publica da Caixa.
+    private readonly string baseUrl = NormalizeBaseUrl(options.Value.BaseUrl);
+
+    // Busca o JSON bruto de um concurso na API publica da Caixa, alternando entre as rotas configuradas.
     public async Task<string> GetContestResultJsonAsync(
         string lotteryModeCode,
         int contestNumber,
         CancellationToken cancellationToken)
     {
         var caixaLotteryCode = ToCaixaLotteryCode(lotteryModeCode);
-        var requestUri = $"https://servicebus3.caixa.gov.br/portaldeloterias/api/{caixaLotteryCode}/{contestNumber}";
+        var requestUri = $"{baseUrl}/{caixaLotteryCode}/{contestNumber}";
+        var routes = proxyRegistry.GetRoutesByPreference(timeProvider.GetUtcNow());
+        var blockedRouteCount = 0;
+        Exception? lastFailure = null;
+
+        foreach (var route in routes)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            try
+            {
+                var json = await SendAsync(route, requestUri, lotteryModeCode, contestNumber, cancellationToken);
+                proxyRegistry.MarkSuccess(route);
+                return json;
+            }
+            catch (CaixaAccessBlockedException exception)
+            {
+                // A rota chegou na Caixa mas foi barrada: normalmente e um proxy fora do Brasil.
+                blockedRouteCount++;
+                lastFailure = exception;
+                proxyRegistry.MarkFailure(route, timeProvider.GetUtcNow());
+                logger.LogWarning(
+                    "Rota {Route} recebeu HTTP 403 da Caixa ao buscar {Mode}/{Contest}.",
+                    route.Description,
+                    lotteryModeCode,
+                    contestNumber);
+            }
+            catch (CaixaTransientApiException exception)
+            {
+                lastFailure = exception;
+                proxyRegistry.MarkFailure(route, timeProvider.GetUtcNow());
+                logger.LogWarning(
+                    "Rota {Route} falhou ao buscar {Mode}/{Contest}: {Motivo}",
+                    route.Description,
+                    lotteryModeCode,
+                    contestNumber,
+                    exception.Message);
+            }
+        }
+
+        // Nenhuma rota respondeu. Um 403 em todas indica bloqueio de origem, e nao instabilidade.
+        if (blockedRouteCount > 0 && blockedRouteCount == routes.Count)
+        {
+            throw new CaixaAccessBlockedException(lotteryModeCode, contestNumber, requestUri);
+        }
+
+        throw new CaixaTransientApiException(
+            lotteryModeCode,
+            contestNumber,
+            $"Nenhuma das {routes.Count} rotas configuradas conseguiu consultar a API da Caixa.",
+            lastFailure);
+    }
+
+    // Executa a consulta por uma rota especifica e traduz o resultado HTTP em excecoes de dominio.
+    private async Task<string> SendAsync(
+        CaixaHttpRoute route,
+        string requestUri,
+        string lotteryModeCode,
+        int contestNumber,
+        CancellationToken cancellationToken)
+    {
+        var httpClient = httpClientFactory.CreateClient(route.ClientName);
         using var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
         request.Headers.TryAddWithoutValidation("accept", "application/json, text/plain, */*");
         request.Headers.TryAddWithoutValidation("accept-language", "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7");
         request.Headers.TryAddWithoutValidation("origin", "https://loterias.caixa.gov.br");
+        request.Headers.TryAddWithoutValidation("referer", "https://loterias.caixa.gov.br/");
+        request.Headers.TryAddWithoutValidation("sec-fetch-dest", "empty");
+        request.Headers.TryAddWithoutValidation("sec-fetch-mode", "cors");
+        request.Headers.TryAddWithoutValidation("sec-fetch-site", "same-site");
         request.Headers.TryAddWithoutValidation(
             "user-agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36");
@@ -28,16 +103,27 @@ public sealed class CaixaLotteryClient(HttpClient httpClient) : ICaixaLotteryCli
         {
             response = await httpClient.SendAsync(request, cancellationToken);
         }
-        catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException)
+        catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException
+            && !cancellationToken.IsCancellationRequested)
         {
-            throw new CaixaTransientApiException(lotteryModeCode, contestNumber, "Erro temporario ao chamar a API da Caixa.", exception);
+            throw new CaixaTransientApiException(
+                lotteryModeCode,
+                contestNumber,
+                $"Erro temporario ao chamar a API da Caixa via {route.Description}.",
+                exception);
         }
 
         using (response)
         {
-            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            if (response.StatusCode == HttpStatusCode.NotFound)
             {
                 throw new CaixaContestNotFoundException(lotteryModeCode, contestNumber);
+            }
+
+            // O 403 do CDN da Caixa e bloqueio por origem geografica e nao se resolve repetindo a chamada.
+            if (response.StatusCode == HttpStatusCode.Forbidden)
+            {
+                throw new CaixaAccessBlockedException(lotteryModeCode, contestNumber, requestUri);
             }
 
             if (IsTransientStatusCode(response.StatusCode))
@@ -45,12 +131,29 @@ public sealed class CaixaLotteryClient(HttpClient httpClient) : ICaixaLotteryCli
                 throw new CaixaTransientApiException(
                     lotteryModeCode,
                     contestNumber,
-                    $"API da Caixa retornou HTTP {(int)response.StatusCode}.");
+                    $"API da Caixa retornou HTTP {(int)response.StatusCode} via {route.Description}.");
             }
 
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new CaixaTransientApiException(
+                    lotteryModeCode,
+                    contestNumber,
+                    $"Resposta inesperada HTTP {(int)response.StatusCode} via {route.Description}.");
+            }
+
             return await response.Content.ReadAsStringAsync(cancellationToken);
         }
+    }
+
+    // Remove a barra final do endereco base para montar a URL do concurso sem duplicar separadores.
+    private static string NormalizeBaseUrl(string? baseUrl)
+    {
+        var effectiveBaseUrl = string.IsNullOrWhiteSpace(baseUrl)
+            ? CaixaLotteryOptions.DefaultBaseUrl
+            : baseUrl;
+
+        return effectiveBaseUrl.TrimEnd('/');
     }
 
     // Converte o codigo interno para o slug esperado pela API da Caixa.
@@ -67,14 +170,13 @@ public sealed class CaixaLotteryClient(HttpClient httpClient) : ICaixaLotteryCli
     }
 
     // Indica codigos HTTP que devem repetir a mesma chamada apos pausa.
-    private static bool IsTransientStatusCode(System.Net.HttpStatusCode statusCode)
+    private static bool IsTransientStatusCode(HttpStatusCode statusCode)
     {
-        return statusCode is System.Net.HttpStatusCode.Forbidden
-            or System.Net.HttpStatusCode.TooManyRequests
-            or System.Net.HttpStatusCode.InternalServerError
-            or System.Net.HttpStatusCode.BadGateway
-            or System.Net.HttpStatusCode.ServiceUnavailable
-            or System.Net.HttpStatusCode.GatewayTimeout;
+        return statusCode is HttpStatusCode.TooManyRequests
+            or HttpStatusCode.InternalServerError
+            or HttpStatusCode.BadGateway
+            or HttpStatusCode.ServiceUnavailable
+            or HttpStatusCode.GatewayTimeout;
     }
 }
 
@@ -84,6 +186,20 @@ public sealed class CaixaContestNotFoundException(string lotteryModeCode, int co
     public string LotteryModeCode { get; } = lotteryModeCode;
 
     public int ContestNumber { get; } = contestNumber;
+}
+
+public sealed class CaixaAccessBlockedException(string lotteryModeCode, int contestNumber, string requestUri)
+    : Exception(
+        $"Acesso bloqueado (HTTP 403) ao consultar {requestUri}. " +
+        "O CDN da Caixa bloqueia requisicoes vindas de fora do Brasil; configure 'Caixa:BaseUrl' " +
+        "para um relay brasileiro ou 'Caixa:Proxy:Addresses' com proxies de IP brasileiro. " +
+        $"Modalidade: {lotteryModeCode}. Concurso: {contestNumber}.")
+{
+    public string LotteryModeCode { get; } = lotteryModeCode;
+
+    public int ContestNumber { get; } = contestNumber;
+
+    public string RequestUri { get; } = requestUri;
 }
 
 public sealed class CaixaTransientApiException(

@@ -28,7 +28,7 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddOpenApi();
-builder.Services.AddHttpClient<ICaixaLotteryClient, CaixaLotteryClient>();
+builder.Services.AddCaixaLotteryClient(builder.Configuration);
 builder.Services.AddKeycloakJwtAuthentication(builder.Configuration);
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.Configure<ContestUpdateScheduleOptions>(
