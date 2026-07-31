@@ -101,6 +101,7 @@ services:
       ContestUpdates__ErrorDelayMilliseconds: "300000"
       ContestUpdates__MaxRetryAttempts: "3"
       Cors__AllowedOrigins__0: https://app.lotoanalytic.com.br
+      Cors__AllowedOrigins__1: https://lotoanalytic.com.br
     depends_on:
       postgres:
         condition: service_healthy

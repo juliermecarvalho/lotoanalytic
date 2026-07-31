@@ -6,7 +6,8 @@ import {
   Outlet,
   redirect,
   RouterProvider,
-  useNavigate
+  useNavigate,
+  useRouterState
 } from "@tanstack/react-router";
 import {
   ChevronDown,
@@ -36,6 +37,7 @@ import { AppState, AppStateContext, useAppState } from "./lib/appState";
 import { AuthService, AuthSession, keycloakAuthService } from "./lib/auth";
 import { GeneratorPage } from "./features/generator/GeneratorPage";
 import { PrivacyPolicyPage } from "./features/legal/PrivacyPolicyPage";
+import { DashboardPage } from "./features/dashboard/DashboardPage";
 import "./styles.css";
 
 const defaultState: AppState = {
@@ -91,6 +93,16 @@ function createAppRouter() {
   const dashboardRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/",
+    component: DashboardPage
+  });
+  const dashboardHomeRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/dashboard",
+    component: DashboardPage
+  });
+  const dashboardLotofacilRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/dashboard/lotofacil",
     component: DashboardPage
   });
   const generatorRoute = createRoute({
@@ -157,6 +169,8 @@ function createAppRouter() {
   });
   const routeTree = rootRoute.addChildren([
     dashboardRoute,
+    dashboardHomeRoute,
+    dashboardLotofacilRoute,
     generatorRoute,
     legacyGeneratorRoute,
     checkerRoute,
@@ -174,8 +188,14 @@ function createAppRouter() {
   return createRouter({ routeTree });
 }
 
+// Rotas do painel usam layout proprio de tela cheia, sem o chrome padrao da aplicacao.
+function isDashboardPath(pathname: string) {
+  return pathname === "/" || pathname === "/dashboard" || pathname.startsWith("/dashboard/");
+}
+
 function Shell() {
   const { state, setState, authService } = useAppState();
+  const pathname = useRouterState({ select: (routerState) => routerState.location.pathname });
   const isAdmin = hasRole(state.currentUser, "administrador");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
@@ -200,6 +220,11 @@ function Shell() {
     setUserMenuOpen(false);
     await authService.logout();
     setState({ ...state, auth: null, currentUser: null });
+  }
+
+  // O painel estatistico traz sua propria barra lateral e cabecalho: entregamos apenas o conteudo.
+  if (isDashboardPath(pathname)) {
+    return <Outlet />;
   }
 
   return (
@@ -308,54 +333,6 @@ function AuthCallbackPage() {
 async function syncCurrentUser(apiBaseUrl: string, session: AuthSession) {
   const client = new ApiClient({ baseUrl: apiBaseUrl, token: session.accessToken });
   return await client.getJson<CurrentUserResponse>("/usuarios/me");
-}
-
-function DashboardPage() {
-  const { state } = useAppState();
-  const [numbers, setNumbers] = useState("01 02 03 04 05 06 07 08 09 10 11 12 13 14 15");
-  const [previousNumbers, setPreviousNumbers] = useState("01 02 04 06 08 10 12 14 16 18 20 21 22 23 24");
-  const [statistics, setStatistics] = useState<LotofacilStatisticsResponse | null>(null);
-  const [status, setStatus] = useState("Pronto");
-
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setStatus("Calculando");
-    try {
-      const client = new ApiClient({ baseUrl: state.apiBaseUrl, token: state.auth?.accessToken });
-      const result = await client.postJson("/estatisticas/lotofacil/calcular", {
-        dezenas: parseNumbers(numbers),
-        dezenasAnteriores: parseNumbers(previousNumbers)
-      });
-      setStatistics(result as LotofacilStatisticsResponse);
-      setStatus("Calculado");
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Erro desconhecido");
-    }
-  }
-
-  return (
-    <section className="page">
-      <PageHeader title="Dashboard" description="Resumo estatistico da Lotofacil a partir de dezenas informadas." />
-      <form className="panel grid-two" onSubmit={submit}>
-        <TextArea label="Dezenas sorteadas" value={numbers} onChange={setNumbers} />
-        <TextArea label="Concurso anterior" value={previousNumbers} onChange={setPreviousNumbers} />
-        <button type="submit">Calcular estatisticas</button>
-        <Status text={status} />
-      </form>
-      {statistics && (
-        <div className="metric-grid">
-          <Metric label="Pares" value={statistics.quantidadePares} />
-          <Metric label="Impares" value={statistics.quantidadeImpares} />
-          <Metric label="Soma" value={statistics.somaDezenas} />
-          <Metric label="Primos" value={statistics.quantidadePrimos} />
-          <Metric label="Moldura" value={statistics.quantidadeMoldura} />
-          <Metric label="Miolo" value={statistics.quantidadeMiolo} />
-          <Metric label="Maior sequencia" value={statistics.maiorSequencia} />
-          <Metric label="Repetidas" value={statistics.repetidasAnterior.join(" ")} />
-        </div>
-      )}
-    </section>
-  );
 }
 
 function DetailedStatisticsPage() {
