@@ -1,7 +1,7 @@
 // Pagina de Politica de Privacidade. Exigida pelo Google AdSense e pela LGPD:
 // divulga o uso de cookies, o Google como fornecedor terceiro de anuncios e os
 // direitos do titular dos dados. Rota publica (sem login) para ser rastreavel.
-const CONTACT_EMAIL = "julierme@trustimage.com.br";
+const CONTACT_EMAIL = "juliermecarvalho@gmail.com";
 const LAST_UPDATED = "30 de julho de 2026";
 
 export function PrivacyPolicyPage() {
