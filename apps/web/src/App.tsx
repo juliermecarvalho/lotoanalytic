@@ -37,6 +37,7 @@ import { AuthService, AuthSession, keycloakAuthService } from "./lib/auth";
 import { GeneratorPage } from "./features/generator/GeneratorPage";
 import { PrivacyPolicyPage } from "./features/legal/PrivacyPolicyPage";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
+import { AdBlockGate } from "./features/adblock/AdBlockGate";
 import "./styles.css";
 
 const defaultState: AppState = {
@@ -80,6 +81,7 @@ export function App({
   return (
     <AppStateContext.Provider value={{ state, setState, authService }}>
       <RouterProvider router={router} />
+      <AdBlockGate />
     </AppStateContext.Provider>
   );
 }
