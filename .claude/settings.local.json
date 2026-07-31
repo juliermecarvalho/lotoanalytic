@@ -5,7 +5,12 @@
       "PowerShell(wsl -d Ubuntu -- bash -lc \"cd ~/repo/lotoanalytic && source ~/.bashrc && parse_git_branch && echo '' && file ~/.bashrc\")",
       "PowerShell(wsl -d Ubuntu -- bash -ic \"cd ~/repo/lotoanalytic && parse_git_branch; echo; echo \\\\\"PS1 renderizado: \\\\$\\(cd ~/repo/lotoanalytic && parse_git_branch\\)\\\\\"; file ~/.bashrc\")",
       "PowerShell(wsl -d Ubuntu -- file ~/.bashrc; wsl -d Ubuntu -- tail -n 20 ~/.bashrc)",
-      "PowerShell(wsl -d Ubuntu -- bash -c 'file $HOME/.bashrc; tail -n 18 $HOME/.bashrc')"
+      "PowerShell(wsl -d Ubuntu -- bash -c 'file $HOME/.bashrc; tail -n 18 $HOME/.bashrc')",
+      "Bash(curl -s -o /dev/null -w \"com headers: %{http_code}\\\\n\" -H \"accept: application/json, text/plain, */*\" -H \"origin: https://loterias.caixa.gov.br\" -H \"referer: https://loterias.caixa.gov.br/\" -H \"user-agent: Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/148.0.0.0 Safari/537.36\" --max-time 30 https://servicebus3.caixa.gov.br/portaldeloterias/api/lotofacil/3500)",
+      "Bash(curl -s -o /dev/null -w \"sem headers: %{http_code}\\\\n\" --max-time 30 https://servicebus3.caixa.gov.br/portaldeloterias/api/lotofacil/3500)",
+      "Bash(wsl.exe *)",
+      "PowerShell(dotnet test *)",
+      "WebSearch"
     ]
   }
 }

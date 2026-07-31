@@ -235,4 +235,56 @@ public sealed class ContestBulkUpdateServiceTests
         retryEvent.RetryAttempt.ShouldBe(1);
         retryEvent.RetryDelayMilliseconds.ShouldBe(0);
     }
+
+    [Fact]
+    public async Task UpdateAllDoesNotRetryBlockedAccessAndContinuesToNextMode()
+    {
+        var store = Substitute.For<IContestImportStore>();
+        var client = Substitute.For<ICaixaLotteryClient>();
+        var blockedMode = new LotteryMode
+        {
+            Id = Guid.Parse("55555555-5555-5555-5555-555555555555"),
+            Code = "lotofacil",
+            Name = "Lotofacil",
+            CaixaGameType = "LOTOFACIL",
+            MainNumbersCount = 15,
+            Active = true
+        };
+        var nextMode = new LotteryMode
+        {
+            Id = Guid.Parse("66666666-6666-6666-6666-666666666666"),
+            Code = "quina",
+            Name = "Quina",
+            CaixaGameType = "QUINA",
+            MainNumbersCount = 5,
+            Active = true
+        };
+
+        store.ListActiveModesAsync(TestContext.Current.CancellationToken).Returns([blockedMode, nextMode]);
+        store.GetLatestContestNumberAsync(blockedMode.Id, TestContext.Current.CancellationToken).Returns(10);
+        store.GetLatestContestNumberAsync(nextMode.Id, TestContext.Current.CancellationToken).Returns(7073);
+        client
+            .GetContestResultJsonAsync("lotofacil", 11, TestContext.Current.CancellationToken)
+            .Returns(Task.FromException<string>(
+                new CaixaAccessBlockedException("lotofacil", 11, "https://servicebus3.caixa.gov.br/portaldeloterias/api/lotofacil/11")));
+        client
+            .GetContestResultJsonAsync("quina", 7074, TestContext.Current.CancellationToken)
+            .Returns(Task.FromException<string>(new CaixaContestNotFoundException("quina", 7074)));
+        var service = new ContestBulkUpdateService(store, client, Substitute.For<IFilterStatisticsRefreshService>());
+
+        var result = await service.UpdateAllAsync(
+            new ContestBulkUpdateRequest(DelayMilliseconds: 0, ErrorDelayMilliseconds: 0),
+            TestContext.Current.CancellationToken);
+
+        // O bloqueio nao pode virar retry infinito: a chamada acontece uma unica vez.
+        await client.Received(1).GetContestResultJsonAsync("lotofacil", 11, TestContext.Current.CancellationToken);
+        result.Modes[0].Status.ShouldBe("falhou");
+        result.Modes[0].Error.ShouldNotBeNull();
+        result.Modes[0].Error!.ShouldContain("403");
+
+        // As demais modalidades continuam sendo processadas mesmo com a primeira bloqueada.
+        result.Modes.Count.ShouldBe(2);
+        result.Modes[1].ModeCode.ShouldBe("quina");
+        result.Modes[1].Status.ShouldBe("sem_novos_concursos");
+    }
 }

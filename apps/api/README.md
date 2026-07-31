@@ -47,6 +47,31 @@ Configure um realm existente no Keycloak e ajuste a secao `Keycloak`:
 
 O backend valida JWT Bearer, usa `preferred_username` como nome do usuario e converte `realm_access.roles` para roles do ASP.NET Core.
 
+## Caixa
+
+A importacao de concursos consulta a API publica da Caixa. O CDN dela (Azion) responde **HTTP 403 para requisicoes vindas de fora do Brasil**, independentemente dos cabecalhos enviados. Servidores hospedados no exterior precisam de uma rota alternativa.
+
+```json
+{
+  "Caixa": {
+    "BaseUrl": "https://servicebus3.caixa.gov.br/portaldeloterias/api",
+    "Proxy": {
+      "Enabled": false,
+      "Address": "",
+      "Username": "",
+      "Password": ""
+    }
+  }
+}
+```
+
+- `BaseUrl`: endereco base das consultas. Aponte para um relay hospedado no Brasil que repasse as chamadas para `servicebus3.caixa.gov.br`. O caminho `/{modalidade}/{numeroConcurso}` e acrescentado pela aplicacao.
+- `Proxy`: faz as chamadas sairem por um proxy, normalmente com IP brasileiro. Aceita os esquemas `http`, `https`, `socks4`, `socks4a` e `socks5`. `Username` e `Password` sao opcionais.
+
+Use uma das duas opcoes, nao as duas. Em producao, as variaveis correspondentes sao `Caixa__BaseUrl`, `Caixa__Proxy__Enabled`, `Caixa__Proxy__Address`, `Caixa__Proxy__Username` e `Caixa__Proxy__Password`.
+
+O 403 e tratado como falha definitiva (`CaixaAccessBlockedException`), nao como erro temporario: repetir a chamada nao resolve bloqueio geografico. A modalidade e marcada como `falhou` e a importacao segue para a proxima. Erros realmente temporarios (429 e 5xx) continuam sendo repetidos ate `ContestUpdates:MaxRetryAttempts`.
+
 ## Comandos
 
 ```powershell

@@ -6,6 +6,7 @@ using LotoAnalytics.Api.Features.FilterStatistics;
 using LotoAnalytics.Api.Features.GameGeneration;
 using LotoAnalytics.Api.Features.GameChecking;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,7 +29,19 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddOpenApi();
-builder.Services.AddHttpClient<ICaixaLotteryClient, CaixaLotteryClient>();
+builder.Services.Configure<CaixaLotteryOptions>(
+    builder.Configuration.GetSection(CaixaLotteryOptions.SectionName));
+builder.Services
+    .AddHttpClient<ICaixaLotteryClient, CaixaLotteryClient>()
+    .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
+    {
+        // Sai por proxy quando configurado, permitindo usar um IP brasileiro para driblar o bloqueio da Caixa.
+        var caixaOptions = serviceProvider
+            .GetRequiredService<IOptions<CaixaLotteryOptions>>()
+            .Value;
+
+        return CaixaHttpHandlerFactory.Create(caixaOptions.Proxy);
+    });
 builder.Services.AddKeycloakJwtAuthentication(builder.Configuration);
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.Configure<ContestUpdateScheduleOptions>(
