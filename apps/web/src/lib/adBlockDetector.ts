@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // URL do script do AdSense usada como sonda de rede (bloqueada por extensoes de bloqueio).
 const AD_SCRIPT_URL = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
@@ -77,17 +77,81 @@ export interface AdBlockGateState {
   recheck: () => void;
 }
 
+// Tempo para o Funding Choices (recuperacao oficial do AdSense) renderizar a mensagem
+// antes de o overlay proprio assumir o bloqueio.
+const OFFICIAL_RECOVERY_GRACE_MS = 2500;
+
+// Indica se a mensagem OFICIAL de recuperacao de bloqueio (Funding Choices) esta VISIVEL
+// na tela. Quando esta, o overlay proprio se cala para nao criar um muro duplo.
+// Ignora o iframe-sinal invisivel do bootstrap (name="googlefcPresent").
+export function isOfficialAdBlockMessageVisible(): boolean {
+  if (typeof document === "undefined") {
+    return false;
+  }
+
+  const candidates = document.querySelectorAll(
+    'iframe[src*="fundingchoices"], iframe[name*="googlefc"], .fc-dialog-container, .fc-ab-root, [class^="fc-"], [class*=" fc-"]'
+  );
+
+  for (const node of Array.from(candidates)) {
+    const element = node as HTMLElement;
+    if (element.getAttribute("name") === "googlefcPresent") {
+      continue; // sinal invisivel do bootstrap; nao conta como mensagem
+    }
+    const rect = element.getBoundingClientRect();
+    if (rect.width > 20 && rect.height > 20) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 // Monitora continuamente o bloqueador e reavalia periodicamente, liberando a tela
 // automaticamente assim que o usuario desativa a extensao.
+//
+// Modo hibrido: se um bloqueador for detectado MAS a mensagem oficial (Funding Choices)
+// estiver na tela, o overlay proprio nao aparece (a oficial tem prioridade). Caso a
+// oficial nao apareca dentro da janela de espera (ex.: site ainda nao aprovado, ou um
+// bloqueador que tambem barra o Funding Choices), o overlay proprio assume o bloqueio.
 export function useAdBlockGate(pollIntervalMs = 4000): AdBlockGateState {
   const [blocked, setBlocked] = useState(false);
   const [checking, setChecking] = useState(true);
+  const graceTimerRef = useRef<number | null>(null);
+
+  const clearGraceTimer = () => {
+    if (graceTimerRef.current !== null) {
+      window.clearTimeout(graceTimerRef.current);
+      graceTimerRef.current = null;
+    }
+  };
 
   const recheck = useCallback(() => {
     setChecking(true);
-    void detectAdBlock().then((result) => {
-      setBlocked(result);
-      setChecking(false);
+    clearGraceTimer();
+
+    void detectAdBlock().then((adBlocked) => {
+      // Sem bloqueador: libera.
+      if (!adBlocked) {
+        setBlocked(false);
+        setChecking(false);
+        return;
+      }
+
+      // Ha bloqueador, mas a mensagem oficial ja esta na tela: defere para ela.
+      if (isOfficialAdBlockMessageVisible()) {
+        setBlocked(false);
+        setChecking(false);
+        return;
+      }
+
+      // Da uma janela para o Funding Choices renderizar a mensagem oficial. So assume
+      // o bloqueio se, apos a espera, nenhuma mensagem oficial estiver visivel.
+      graceTimerRef.current = window.setTimeout(() => {
+        setBlocked(!isOfficialAdBlockMessageVisible());
+        setChecking(false);
+        graceTimerRef.current = null;
+      }, OFFICIAL_RECOVERY_GRACE_MS);
     });
   }, []);
 
@@ -106,6 +170,7 @@ export function useAdBlockGate(pollIntervalMs = 4000): AdBlockGateState {
     return () => {
       window.clearInterval(interval);
       document.removeEventListener("visibilitychange", onVisibilityChange);
+      clearGraceTimer();
     };
   }, [recheck, pollIntervalMs]);
 
