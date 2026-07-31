@@ -97,41 +97,6 @@ export function DashboardPage() {
 
   return (
     <div className="dash-root">
-      <aside className="dash-sidebar" aria-label="Navegacao principal">
-        <div className="dash-brand">
-          <span className="dash-brand-logo">LF</span>
-          <strong>Lotofácil Studio</strong>
-        </div>
-        <nav className="dash-nav">
-          <p className="dash-nav-group">Operação</p>
-          <Link to="/dashboard/lotofacil" className="dash-nav-item" activeProps={{ className: "dash-nav-item active" }}>
-            Painel
-          </Link>
-          <Link to="/concursos/importar" className="dash-nav-item">
-            Concursos
-          </Link>
-          <Link to="/gerar-jogos/lotofacil" className="dash-nav-item">
-            Geração de jogos
-          </Link>
-          <Link to="/conferidor" className="dash-nav-item">
-            Conferência
-          </Link>
-          <p className="dash-nav-group">Análise</p>
-          <Link to="/estatisticas/detalhes" className="dash-nav-item">
-            Estatísticas
-          </Link>
-          <Link to="/gerar-jogos/lotofacil" className="dash-nav-item">
-            Presets de filtro
-          </Link>
-        </nav>
-        <div className="dash-sidebar-footer">
-          <span className="dash-avatar" aria-hidden="true">
-            {(state.auth?.username ?? "LF").slice(0, 2).toUpperCase()}
-          </span>
-          <span className="dash-sidebar-user">{state.auth?.username ?? "Visitante"}</span>
-        </div>
-      </aside>
-
       <div className="dash-main">
         <header className="dash-header">
           <div>

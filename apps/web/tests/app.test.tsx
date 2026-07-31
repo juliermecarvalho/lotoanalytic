@@ -60,10 +60,11 @@ describe("LotoAnalytics web", () => {
   it("renders the statistical dashboard at the root route", async () => {
     render(<App authService={noopAuthService} />);
 
-    // A raiz agora entrega o painel estatistico com barra lateral e atalho para a geracao.
+    // A raiz entrega o painel estatistico dentro do chrome padrao, com a barra lateral unica e atalho para a geracao.
     expect(await screen.findByRole("heading", { name: "Painel estatístico Lotofácil" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Painel" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Geração de jogos" })).toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "Principal" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Lotofácil" })).toBeInTheDocument();
+    expect(screen.queryByRole("navigation", { name: "Navegacao principal" })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Gerar jogos" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Entrar com Keycloak/ })).not.toBeInTheDocument();
   });

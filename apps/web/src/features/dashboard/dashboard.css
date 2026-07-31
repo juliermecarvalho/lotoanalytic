@@ -1,9 +1,11 @@
 /* Painel estatistico Lotofacil — layout e estilos derivados do design "Dashboard". */
 
+/* A barra lateral vem do chrome padrao da aplicacao: aqui resta apenas a coluna de conteudo. */
 .dash-root {
-  display: grid;
-  grid-template-columns: 232px minmax(0, 1fr);
-  min-height: 100vh;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
   background: #f6f7f9;
   color: #1f2933;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -11,106 +13,6 @@
 
 .dash-root :is(.dash-kpi-value, .dash-bar-value, .dash-filter-count, .dash-filter-percent, .dash-chip, .dash-ball) {
   font-variant-numeric: tabular-nums;
-}
-
-/* Sidebar */
-.dash-sidebar {
-  background: #17212b;
-  color: #f8fafc;
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-  height: 100vh;
-  padding: 20px 16px;
-  position: sticky;
-  top: 0;
-}
-
-.dash-brand {
-  align-items: center;
-  display: flex;
-  gap: 10px;
-}
-
-.dash-brand-logo {
-  align-items: center;
-  background: #1f6f8b;
-  border-radius: 8px;
-  color: #ffffff;
-  display: flex;
-  font-weight: 700;
-  height: 34px;
-  justify-content: center;
-  width: 34px;
-}
-
-.dash-brand strong {
-  font-size: 15px;
-}
-
-.dash-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.dash-nav-group {
-  color: #9fb3c8;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  margin: 14px 0 4px;
-  text-transform: uppercase;
-}
-
-.dash-nav-group:first-child {
-  margin-top: 0;
-}
-
-.dash-nav-item {
-  border-radius: 8px;
-  color: #dbe4ea;
-  display: block;
-  font-size: 13.5px;
-  padding: 9px 12px;
-  text-decoration: none;
-}
-
-.dash-nav-item:hover {
-  background: #25313d;
-}
-
-.dash-nav-item.active {
-  background: #25313d;
-  color: #f8fafc;
-  font-weight: 600;
-}
-
-.dash-sidebar-footer {
-  align-items: center;
-  border-top: 1px solid #25313d;
-  display: flex;
-  gap: 10px;
-  margin-top: auto;
-  padding-top: 16px;
-}
-
-.dash-avatar {
-  align-items: center;
-  background: #25313d;
-  border-radius: 50%;
-  display: flex;
-  font-size: 12px;
-  font-weight: 600;
-  height: 34px;
-  justify-content: center;
-  width: 34px;
-}
-
-.dash-sidebar-user {
-  font-size: 13px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* Header */
