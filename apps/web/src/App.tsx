@@ -6,8 +6,7 @@ import {
   Outlet,
   redirect,
   RouterProvider,
-  useNavigate,
-  useRouterState
+  useNavigate
 } from "@tanstack/react-router";
 import {
   ChevronDown,
@@ -188,14 +187,8 @@ function createAppRouter() {
   return createRouter({ routeTree });
 }
 
-// Rotas do painel usam layout proprio de tela cheia, sem o chrome padrao da aplicacao.
-function isDashboardPath(pathname: string) {
-  return pathname === "/" || pathname === "/dashboard" || pathname.startsWith("/dashboard/");
-}
-
 function Shell() {
   const { state, setState, authService } = useAppState();
-  const pathname = useRouterState({ select: (routerState) => routerState.location.pathname });
   const isAdmin = hasRole(state.currentUser, "administrador");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
@@ -220,11 +213,6 @@ function Shell() {
     setUserMenuOpen(false);
     await authService.logout();
     setState({ ...state, auth: null, currentUser: null });
-  }
-
-  // O painel estatistico traz sua propria barra lateral e cabecalho: entregamos apenas o conteudo.
-  if (isDashboardPath(pathname)) {
-    return <Outlet />;
   }
 
   return (
