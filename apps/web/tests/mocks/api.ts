@@ -82,6 +82,62 @@ export const handlers = [
       totalConcursos: 3412
     });
   }),
+  http.get("*/estatisticas/lotofacil/painel", ({ request }) => {
+    track(request);
+
+    return HttpResponse.json({
+      codigoModalidade: "lotofacil",
+      totalConcursos: 3411,
+      ultimoConcurso: {
+        numero: 3411,
+        dataApuracao: "2026-07-24",
+        dezenas: ["01", "02", "03", "05", "07", "09", "11", "13", "14", "17", "19", "20", "22", "24", "25"],
+        pares: 7,
+        impares: 8,
+        soma: 192,
+        primos: 6,
+        moldura: 10,
+        repetidasAnterior: 9
+      },
+      resumo: {
+        somaMedia: 195.0,
+        repeticaoMedia: 9.0,
+        combinacoesIneditasPercentual: 99.9,
+        faixaSomaPreferencialPercentual: 47.9
+      },
+      frequencias: Array.from({ length: 25 }, (_value, index) => ({
+        dezena: index + 1,
+        quantidade: 2000 + index,
+        percentual: 58 + (index % 5),
+        atraso: index % 8,
+        ultimoConcurso: 3411 - (index % 8)
+      })),
+      categorias: {
+        paridade: [
+          { valor: 7, quantidade: 993 },
+          { valor: 8, quantidade: 914 }
+        ],
+        repeticao: [
+          { valor: 9, quantidade: 815 },
+          { valor: 8, quantidade: 723 }
+        ],
+        primos: [{ valor: 5, quantidade: 1010 }],
+        moldura: [{ valor: 9, quantidade: 948 }],
+        soma: [
+          { valor: 190, quantidade: 40 },
+          { valor: 200, quantidade: 38 }
+        ],
+        grade: [
+          { valor: 0, quantidade: 1409 },
+          { valor: 1, quantidade: 1320 }
+        ],
+        sequencia: [
+          { valor: 4, quantidade: 952 },
+          { valor: 5, quantidade: 832 }
+        ]
+      }
+    });
+  }),
   http.get("*/estatisticas/lotofacil/filtros", ({ request }) => {
     track(request);
 

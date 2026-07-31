@@ -57,22 +57,20 @@ describe("LotoAnalytics web", () => {
     vi.restoreAllMocks();
   });
 
-  it("renders a sidebar with only the generator entry", async () => {
+  it("renders the statistical dashboard at the root route", async () => {
     render(<App authService={noopAuthService} />);
 
-    expect(await screen.findByRole("link", { name: "Lotofácil" })).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /Dashboard/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /Estatisticas/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /Conferidor/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /Historicos/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /Perfil/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /Modalidades/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /Importar/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /Admin/ })).not.toBeInTheDocument();
+    // A raiz agora entrega o painel estatistico com barra lateral e atalho para a geracao.
+    expect(await screen.findByRole("heading", { name: "Painel estatístico Lotofácil" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Painel" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Geração de jogos" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Gerar jogos" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Entrar com Keycloak/ })).not.toBeInTheDocument();
   });
 
   it("shows the user dropdown with admin entry only for administrators", async () => {
+    // O menu do usuario vive no chrome padrao; o painel em tela cheia nao o exibe.
+    window.history.pushState({}, "", "/perfil");
     const { unmount } = render(
       <App
         authService={noopAuthService}
@@ -90,7 +88,7 @@ describe("LotoAnalytics web", () => {
     expect(screen.getByRole("menuitem", { name: /Sair/ })).toBeInTheDocument();
 
     unmount();
-    window.history.pushState({}, "", "/");
+    window.history.pushState({}, "", "/perfil");
 
     render(
       <App
@@ -121,7 +119,7 @@ describe("LotoAnalytics web", () => {
       />
     );
 
-    fireEvent.click(await screen.findByRole("link", { name: "Lotofácil" }));
+    navigateTo("/gerar-jogos/lotofacil");
     expect(await screen.findByRole("heading", { name: "Filtros matemáticos" })).toBeInTheDocument();
     const quantityInput = screen.getByLabelText("Quantidade");
     expect(quantityInput).toHaveAttribute("max", "30");
@@ -212,7 +210,7 @@ describe("LotoAnalytics web", () => {
     );
 
     render(<App authService={noopAuthService} />);
-    fireEvent.click(await screen.findByRole("link", { name: "Lotofácil" }));
+    navigateTo("/gerar-jogos/lotofacil");
 
     // Preferencias persistidas: quantidade, filtro de primos desligado e dezena incluida.
     expect(await screen.findByLabelText("Quantidade")).toHaveValue(20);
@@ -230,7 +228,7 @@ describe("LotoAnalytics web", () => {
   it("marks fixed numbers from the previous contest suggestion", async () => {
     render(<App authService={noopAuthService} />);
 
-    fireEvent.click(await screen.findByRole("link", { name: "Lotofácil" }));
+    navigateTo("/gerar-jogos/lotofacil");
     fireEvent.click(await screen.findByRole("button", { name: "Sugerir 9 fixas (Grupo A)" }));
 
     expect(await screen.findByText(/9 dezenas fixas em todos os cartões/)).toBeInTheDocument();
@@ -310,12 +308,11 @@ describe("LotoAnalytics web", () => {
       />
     );
 
-    // Aguarda o roteador estabilizar na rota inicial antes de interagir com o dropdown.
-    expect(await screen.findByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
+    // A rota inicial entrega o painel estatistico em tela cheia.
+    expect(await screen.findByRole("heading", { name: "Painel estatístico Lotofácil" })).toBeInTheDocument();
 
-    // Perfil agora fica no dropdown do usuario.
-    fireEvent.click(await screen.findByRole("button", { name: /usuario.teste/ }));
-    fireEvent.click(await screen.findByRole("menuitem", { name: /Perfil/ }));
+    // Perfil continua acessivel por URL direta, fora do painel.
+    navigateTo("/perfil");
     fireEvent.click(await screen.findByRole("button", { name: "Carregar perfil" }));
     expect(await screen.findByText("Plano Premium")).toBeInTheDocument();
 

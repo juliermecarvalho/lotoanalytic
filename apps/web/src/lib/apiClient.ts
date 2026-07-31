@@ -122,6 +122,42 @@ export type LatestContestResponse = {
   totalConcursos: number;
 };
 
+export type DashboardSummary = {
+  somaMedia: number;
+  repeticaoMedia: number;
+  combinacoesIneditasPercentual: number;
+  faixaSomaPreferencialPercentual: number;
+};
+
+export type DashboardFrequency = {
+  dezena: number;
+  quantidade: number;
+  percentual: number;
+  atraso: number;
+  ultimoConcurso: number | null;
+};
+
+export type DashboardLatestContest = {
+  numero: number;
+  dataApuracao?: string | null;
+  dezenas: string[];
+  pares: number;
+  impares: number;
+  soma: number;
+  primos: number;
+  moldura: number;
+  repetidasAnterior: number;
+};
+
+export type DashboardResponse = {
+  codigoModalidade: string;
+  totalConcursos: number;
+  ultimoConcurso: DashboardLatestContest | null;
+  resumo: DashboardSummary;
+  frequencias: DashboardFrequency[];
+  categorias: Record<string, Array<{ valor: number; quantidade: number }>>;
+};
+
 export type ContestImportResponse = {
   codigoModalidade: string;
   numeroConcurso: number;
