@@ -10,7 +10,8 @@
       "Bash(curl -s -o /dev/null -w \"sem headers: %{http_code}\\\\n\" --max-time 30 https://servicebus3.caixa.gov.br/portaldeloterias/api/lotofacil/3500)",
       "Bash(wsl.exe *)",
       "PowerShell(dotnet test *)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(curl -s --max-time 30 -H \"accept: application/json, text/plain, */*\" -H \"user-agent: Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/148.0.0.0 Safari/537.36\" https://servicebus3.caixa.gov.br/portaldeloterias/api/lotofacil/3500)"
     ]
   }
 }
