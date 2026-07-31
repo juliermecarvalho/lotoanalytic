@@ -72,13 +72,8 @@ services:
       postgres-init:
         condition: service_completed_successfully
     networks: [internal, dokploy-network]
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=dokploy-network
-      - traefik.http.routers.loto-auth.rule=Host(`auth.lotoanalytic.com.br`)
-      - traefik.http.routers.loto-auth.entrypoints=websecure
-      - traefik.http.routers.loto-auth.tls.certresolver=letsencrypt
-      - traefik.http.services.loto-auth.loadbalancer.server.port=8080
+    # Roteamento/HTTPS gerenciado pela aba "Domains" do serviço no Dokploy (evita
+    # conflito de routers no Traefik). Nao adicionar labels traefik.* aqui.
     restart: unless-stopped
 
   api:
@@ -116,13 +111,7 @@ services:
       postgres:
         condition: service_healthy
     networks: [internal, dokploy-network]
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=dokploy-network
-      - traefik.http.routers.loto-api.rule=Host(`api.lotoanalytic.com.br`)
-      - traefik.http.routers.loto-api.entrypoints=websecure
-      - traefik.http.routers.loto-api.tls.certresolver=letsencrypt
-      - traefik.http.services.loto-api.loadbalancer.server.port=8080
+    # Roteamento/HTTPS gerenciado pela aba "Domains" do serviço no Dokploy.
     restart: unless-stopped
 
   web:
@@ -144,13 +133,7 @@ services:
     depends_on:
       - api
     networks: [dokploy-network]
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=dokploy-network
-      - traefik.http.routers.loto-web.rule=Host(`app.lotoanalytic.com.br`)
-      - traefik.http.routers.loto-web.entrypoints=websecure
-      - traefik.http.routers.loto-web.tls.certresolver=letsencrypt
-      - traefik.http.services.loto-web.loadbalancer.server.port=80
+    # Roteamento/HTTPS gerenciado pela aba "Domains" do serviço no Dokploy.
     restart: unless-stopped
 
 networks:
