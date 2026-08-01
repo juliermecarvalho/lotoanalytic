@@ -404,8 +404,9 @@ th {
     grid-template-columns: 1fr;
   }
 
-  .sidebar nav {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  .sidebar {
+    height: auto;
+    position: static;
   }
 
   .sidebar nav {
@@ -415,10 +416,37 @@ th {
   .toolbar,
   .grid-two,
   .grid-three,
-  .metric-grid,
   .split,
   .award-summary {
     grid-template-columns: 1fr;
+  }
+
+  .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Ajustes finos para celulares: recuos menores e indicadores em duas colunas. */
+@media (max-width: 600px) {
+  .page {
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .toolbar {
+    padding: 10px 16px;
+  }
+
+  .page-header h1 {
+    font-size: 22px;
+  }
+
+  .metric-grid {
+    gap: 10px;
+  }
+
+  .actions {
+    flex-wrap: wrap;
   }
 }
 

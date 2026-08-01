@@ -1131,3 +1131,76 @@
     width: min(300px, 100%);
   }
 }
+
+/* Telas de celular: reduz recuos, deixa o volante fluido e evita rolagem horizontal. */
+@media (max-width: 640px) {
+  .gen-filters-head,
+  .gen-games-head,
+  .gen-games-foot,
+  .gen-script-box {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .gen-filters-head {
+    flex-wrap: wrap;
+  }
+
+  .gen-stats,
+  .gen-weights {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .gen-games-list {
+    padding: 12px 16px;
+  }
+
+  /* O volante 5x5 passa a usar colunas fluidas para nao estourar a largura da tela. */
+  .gen-board {
+    gap: 5px;
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .gen-cell {
+    width: 100%;
+  }
+
+  .gen-numbers-body {
+    display: block;
+  }
+
+  .gen-tags {
+    margin-top: 12px;
+  }
+
+  .gen-games-head,
+  .gen-games-foot {
+    flex-wrap: wrap;
+  }
+
+  .gen-games-controls {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .gen-games-foot-actions {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .gen-weights-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Sem espaco para a coluna de quantidade absoluta nas opcoes de filtro. */
+  .gen-option-qty {
+    display: none;
+  }
+
+  .gen-option-label {
+    flex-basis: 96px;
+    width: 96px;
+  }
+}

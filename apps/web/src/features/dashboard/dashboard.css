@@ -537,3 +537,91 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Telas de celular: a barra lateral vira um topo horizontal e o conteudo ocupa a largura toda. */
+@media (max-width: 720px) {
+  .dash-root {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dash-sidebar {
+    flex-direction: column;
+    gap: 12px;
+    height: auto;
+    padding: 14px 16px;
+    position: static;
+  }
+
+  .dash-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* Rotulos de grupo ("Operacao"/"Analise") poluem a barra horizontal no celular. */
+  .dash-nav-group {
+    display: none;
+  }
+
+  .dash-nav-item {
+    padding: 8px 12px;
+  }
+
+  .dash-sidebar-footer {
+    display: none;
+  }
+
+  .dash-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .dash-header h1 {
+    font-size: 18px;
+  }
+
+  .dash-btn-primary {
+    width: 100%;
+    text-align: center;
+  }
+
+  .dash-body {
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .dash-card,
+  .dash-filter-head,
+  .dash-filter-grid {
+    padding: 14px;
+  }
+
+  .dash-kpis {
+    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dash-kpi-value {
+    font-size: 22px;
+  }
+
+  .dash-card-foot,
+  .dash-filter-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* A linha do filtro fica sem a coluna de contagem para caber em telas estreitas. */
+  .dash-filter-row {
+    grid-template-columns: minmax(72px, auto) minmax(0, 1fr) 44px;
+  }
+
+  .dash-filter-count {
+    display: none;
+  }
+
+  .dash-bars {
+    height: 150px;
+  }
+}
