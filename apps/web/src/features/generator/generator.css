@@ -5,6 +5,24 @@
   grid-template-columns: minmax(0, 1fr) 300px;
 }
 
+/* Link de retorno ao painel: ocupa a linha inteira no topo do grid. */
+.gen-back-link {
+  align-items: center;
+  align-self: start;
+  color: #9fb3c8;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 600;
+  gap: 6px;
+  grid-column: 1 / -1;
+  text-decoration: none;
+  width: fit-content;
+}
+
+.gen-back-link:hover {
+  color: #f8fafc;
+}
+
 .gen-ad {
   align-items: center;
   color: #78909c;

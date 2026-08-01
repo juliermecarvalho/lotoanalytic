@@ -58,7 +58,7 @@ function AdSpace({ slot, format, className }: { slot: string; format: "728x90" |
 }
 
 // Painel estatistico da Lotofacil: consome o resumo consolidado do backend e monta os cartoes.
-export function DashboardPage() {
+export function DashboardLotofacil() {
   const { state } = useAppState();
   const [data, setData] = useState<DashboardResponse | null>(null);
   const [status, setStatus] = useState<"carregando" | "pronto" | "erro">("carregando");

@@ -10,9 +10,9 @@ import {
 } from "@tanstack/react-router";
 import {
   ChevronDown,
+  LayoutDashboard,
   LogOut,
   RefreshCw,
-  Send,
   ShieldCheck,
   TicketCheck,
   UserCircle
@@ -34,9 +34,9 @@ import {
 } from "./lib/apiClient";
 import { AppState, AppStateContext, useAppState } from "./lib/appState";
 import { AuthService, AuthSession, keycloakAuthService } from "./lib/auth";
-import { GeneratorPage } from "./features/generator/GeneratorPage";
+import { GeneratorLotofacil } from "./features/generator/GeneratorLotofacil";
 import { PrivacyPolicyPage } from "./features/legal/PrivacyPolicyPage";
-import { DashboardPage } from "./features/dashboard/DashboardPage";
+import { DashboardLotofacil } from "./features/dashboard/DashboardLotofacil";
 import { AdBlockGate } from "./features/adblock/AdBlockGate";
 import "./styles.css";
 
@@ -91,25 +91,15 @@ function createAppRouter() {
   const rootRoute = createRootRoute({
     component: Shell
   });
-  const dashboardRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: "/",
-    component: DashboardPage
-  });
-  const dashboardHomeRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: "/dashboard",
-    component: DashboardPage
-  });
   const dashboardLotofacilRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/dashboard/lotofacil",
-    component: DashboardPage
+    component: DashboardLotofacil
   });
   const generatorRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/gerar-jogos/lotofacil",
-    component: GeneratorPage
+    component: GeneratorLotofacil
   });
   const legacyGeneratorRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -169,8 +159,6 @@ function createAppRouter() {
     component: PrivacyPolicyPage
   });
   const routeTree = rootRoute.addChildren([
-    dashboardRoute,
-    dashboardHomeRoute,
     dashboardLotofacilRoute,
     generatorRoute,
     legacyGeneratorRoute,
@@ -186,7 +174,20 @@ function createAppRouter() {
     privacyRoute
   ]);
 
-  return createRouter({ routeTree });
+  // Qualquer rota nao mapeada (incluindo "/" e "/dashboard" sem modalidade) cai no 404.
+  return createRouter({ routeTree, defaultNotFoundComponent: NotFoundPage });
+}
+
+// Pagina 404 exibida para caminhos sem rota, como "/" e "/dashboard" sem modalidade.
+function NotFoundPage() {
+  return (
+    <section className="page">
+      <PageHeader title="Página não encontrada" description="O endereço acessado não existe ou ainda não foi implementado." />
+      <div className="panel actions">
+        <Link to="/dashboard/lotofacil">Ir para o painel da Lotofácil</Link>
+      </div>
+    </section>
+  );
 }
 
 function Shell() {
@@ -225,8 +226,8 @@ function Shell() {
           <strong>LotoAnalytics</strong>
         </div>
         <nav aria-label="Principal">
-          <Link to="/gerar-jogos/lotofacil" activeProps={{ className: "active" }}>
-            <Send size={18} /> Lotofácil
+          <Link to="/dashboard/lotofacil" activeProps={{ className: "active" }}>
+            <LayoutDashboard size={18} /> Lotofácil
           </Link>
         </nav>
       </aside>

@@ -49,7 +49,7 @@ function readBlobText(blob: Blob): Promise<string> {
 
 describe("LotoAnalytics web", () => {
   beforeEach(() => {
-    window.history.pushState({}, "", "/");
+    window.history.pushState({}, "", "/dashboard/lotofacil");
     localStorage.clear();
   });
 
@@ -57,16 +57,26 @@ describe("LotoAnalytics web", () => {
     vi.restoreAllMocks();
   });
 
-  it("renders the statistical dashboard at the root route", async () => {
+  it("renders the statistical dashboard at the lotofacil dashboard route", async () => {
     render(<App authService={noopAuthService} />);
 
-    // A raiz entrega o painel estatistico dentro do chrome padrao, com a barra lateral unica e atalho para a geracao.
+    // A rota /dashboard/lotofacil entrega o painel estatistico dentro do chrome padrao, com a barra lateral unica e atalho para a geracao.
     expect(await screen.findByRole("heading", { name: "Painel estatístico Lotofácil" })).toBeInTheDocument();
     expect(screen.getByRole("navigation", { name: "Principal" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Lotofácil" })).toBeInTheDocument();
     expect(screen.queryByRole("navigation", { name: "Navegacao principal" })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Gerar jogos" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Entrar com Keycloak/ })).not.toBeInTheDocument();
+  });
+
+  it("shows the not found page for routes without a modalidade", async () => {
+    // "/" e "/dashboard" sem modalidade nao existem mais: caem no 404 dentro do chrome padrao.
+    window.history.pushState({}, "", "/");
+    render(<App authService={noopAuthService} />);
+
+    expect(await screen.findByRole("heading", { name: "Página não encontrada" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Ir para o painel da Lotofácil" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Painel estatístico Lotofácil" })).not.toBeInTheDocument();
   });
 
   it("shows the user dropdown with admin entry only for administrators", async () => {

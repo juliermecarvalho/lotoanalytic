@@ -1,4 +1,6 @@
 import { ChangeEvent, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import {
   ApiClient,
   FilterStatisticsResponse,
@@ -114,7 +116,7 @@ function describeGenerationError(error: unknown): string {
 }
 
 // Tela de geracao de jogos da Lotofacil: monta os filtros estatisticos e delega a geracao a API.
-export function GeneratorPage() {
+export function GeneratorLotofacil() {
   const { state } = useAppState();
   // Preferencias persistidas localmente sao carregadas uma unica vez na montagem.
   const [storedPreferences] = useState(() => loadGeneratorPreferences());
@@ -373,6 +375,10 @@ export function GeneratorPage() {
 
   return (
     <section className="page gen-page">
+      <Link to="/dashboard/lotofacil" className="gen-back-link">
+        <ArrowLeft size={16} /> Voltar para o painel
+      </Link>
+
       <AdSpace slot={ADSENSE_SLOTS.leaderboard} format="728x90" className="gen-ad--leaderboard" />
 
       <section className="gen-filters" aria-label="Filtros matemáticos">

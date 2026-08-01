@@ -1,14 +1,17 @@
 import { expect, test } from "@playwright/test";
 
 test("user can navigate implemented screens", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dashboard/lotofacil");
 
-  // A raiz entrega o painel estatistico em tela cheia, com sua propria barra lateral.
+  // O painel estatistico da Lotofacil abre dentro do chrome padrao, com sua barra lateral.
   await expect(page.getByRole("heading", { name: "Painel estatístico Lotofácil" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Painel" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Geração de jogos" })).toBeVisible();
 
-  await page.getByRole("link", { name: "Geração de jogos" }).click();
+  // Atalho do painel para a geracao de jogos.
+  await page.getByRole("link", { name: "Gerar jogos" }).click();
   await expect(page.getByRole("heading", { name: "Filtros matemáticos" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Gerar jogos" })).toBeVisible();
+
+  // Botao de retorno do gerador para o painel.
+  await page.getByRole("link", { name: "Voltar para o painel" }).click();
+  await expect(page.getByRole("heading", { name: "Painel estatístico Lotofácil" })).toBeVisible();
 });
