@@ -6,7 +6,7 @@
 #   POSTGRES_PASSWORD, KEYCLOAK_ADMIN_PASSWORD
 #
 # Dominios (Traefik do Dokploy roteia por Host):
-#   app.lotoanalytic.com.br  -> web
+#   lotoanalytic.com.br      -> web
 #   api.lotoanalytic.com.br  -> api
 #   auth.lotoanalytic.com.br -> keycloak
 #
@@ -105,8 +105,7 @@ services:
       Caixa__Proxy__FailureCooldownSeconds: ${CAIXA_PROXY_COOLDOWN_SECONDS:-120}
       Caixa__Proxy__Username: ${CAIXA_PROXY_USERNAME:-}
       Caixa__Proxy__Password: ${CAIXA_PROXY_PASSWORD:-}
-      Cors__AllowedOrigins__0: https://app.lotoanalytic.com.br
-      Cors__AllowedOrigins__1: https://lotoanalytic.com.br
+      Cors__AllowedOrigins__0: https://lotoanalytic.com.br
     depends_on:
       postgres:
         condition: service_healthy
