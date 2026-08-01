@@ -10,7 +10,6 @@ import {
 } from "../../lib/apiClient";
 import { buildGamesCsv, buildGamesScript } from "./gameExport";
 import {
-  clearGeneratorPreferences,
   loadGeneratorPreferences,
   saveGeneratorPreferences
 } from "./generatorPreferences";
@@ -307,15 +306,6 @@ export function GeneratorLotofacil() {
     setActiveFilters((current) => ({ ...current, [key]: DEFAULT_CHOICES[key] !== null }));
   }
 
-  // Restaura todos os filtros, quantidade e dezenas ao padrao e limpa a persistencia local.
-  function clearFilters() {
-    setChoices({ ...INITIAL_CHOICES });
-    setActiveFilters({ ...DEFAULT_ACTIVE_FILTERS });
-    setCount(10);
-    setSelection({});
-    clearGeneratorPreferences();
-  }
-
   function changeCount(event: ChangeEvent<HTMLInputElement>) {
     setCount(Math.min(30, Math.max(1, parseInt(event.target.value, 10) || 1)));
   }
@@ -387,10 +377,6 @@ export function GeneratorLotofacil() {
             <h2>Filtros matemáticos</h2>
             <p>Cada filtro é calibrado sobre {calibrationLabel} sorteios reais. Selecione um para ver a estatística histórica.</p>
           </div>
-          <button type="button" className="gen-btn-clear-filters" onClick={clearFilters}>
-            Limpar filtros
-          </button>
-          <span className="gen-filters-badge">Diferencial</span>
         </div>
 
         <div className="gen-filters-body">

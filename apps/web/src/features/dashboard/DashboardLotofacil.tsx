@@ -236,7 +236,6 @@ export function DashboardLotofacil() {
                   <h2>Quantos jogos saíram por filtro</h2>
                   <p>Contagem histórica de cada opção dos filtros matemáticos, sobre {formatInt(total)} sorteios</p>
                 </div>
-                <span className="dash-badge">Diferencial</span>
               </div>
               <div className="dash-filter-grid">
                 {filterBlocks.map((block) => {
