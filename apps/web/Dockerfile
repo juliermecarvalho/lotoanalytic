@@ -21,12 +21,15 @@ ENV VITE_ADSENSE_SLOT_HALF_PAGE=$VITE_ADSENSE_SLOT_HALF_PAGE
 ENV VITE_ADSENSE_SLOT_SIDEBAR_EXTRA=$VITE_ADSENSE_SLOT_SIDEBAR_EXTRA
 ENV VITE_ADSENSE_SLOT_RESPONSIVE=$VITE_ADSENSE_SLOT_RESPONSIVE
 
-COPY package*.json ./
+# Contexto de build e a raiz do repositorio (ver docker-compose): caminhos sao relativos a ela.
+COPY apps/web/package*.json ./
 RUN npm ci
 
-COPY . .
+COPY apps/web/ ./
 RUN npm run build
 
 FROM nginx:1.27-alpine
 COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Landing estatica empacotada no mesmo container: servida no dominio apex pelo nginx.
+COPY apps/landing /usr/share/nginx/html/landing
+COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
