@@ -17,3 +17,6 @@ build/
 bd/postgres-data/
 bd/backups/
 bd/import/
+
+# symlink acidental para a copia Windows
+LotoAnalytics
