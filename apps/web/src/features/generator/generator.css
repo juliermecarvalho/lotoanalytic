@@ -1203,4 +1203,15 @@
     flex-basis: 96px;
     width: 96px;
   }
+
+  /* Os selos do jogo iam para fora do card: quebram para uma linha propria. */
+  .gen-game-head {
+    flex-wrap: wrap;
+  }
+
+  .gen-game-badges {
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    margin-left: 0;
+  }
 }
