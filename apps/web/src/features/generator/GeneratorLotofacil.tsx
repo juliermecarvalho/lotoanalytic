@@ -6,7 +6,8 @@ import {
   FilterStatisticsResponse,
   GenerateGamesRequest,
   GenerateGamesResponse,
-  LatestContestResponse
+  LatestContestResponse,
+  LotteryModeResponse
 } from "../../lib/apiClient";
 import { buildGamesCsv, buildGamesScript } from "./gameExport";
 import {
@@ -134,6 +135,8 @@ export function GeneratorLotofacil() {
   const [scriptCopied, setScriptCopied] = useState(false);
   const [latestContest, setLatestContest] = useState<LatestContestResponse | null>(null);
   const [filterStatistics, setFilterStatistics] = useState<FilterStatisticsResponse | null>(null);
+  // Preco da aposta simples vem da modalidade (fonte de verdade); 3.5 e o fallback atual da Lotofacil.
+  const [betPrice, setBetPrice] = useState(3.5);
   const requestSequence = useRef(0);
   const selectionGenerationReady = useRef(false);
 
@@ -154,6 +157,18 @@ export function GeneratorLotofacil() {
       .then((statistics) => {
         if (active) {
           setFilterStatistics(statistics);
+        }
+      })
+      .catch(() => undefined);
+    client
+      .getJson<LotteryModeResponse[]>("/modalidades")
+      .then((modes) => {
+        if (!active) {
+          return;
+        }
+        const lotofacil = modes.find((mode) => mode.codigo === "lotofacil");
+        if (lotofacil?.valorApostaSimples != null) {
+          setBetPrice(lotofacil.valorApostaSimples);
         }
       })
       .catch(() => undefined);
@@ -627,7 +642,7 @@ export function GeneratorLotofacil() {
 
         <div className="gen-games-foot">
           <span className="gen-cost">
-            {`Custo estimado: R$ ${formatCurrency(games.length * 3)}`}{" "}
+            {`Custo estimado: R$ ${formatCurrency(games.length * betPrice)}`}{" "}
             · nenhum jogo repete sorteio já registrado na base.
           </span>
           <div className="gen-games-foot-actions">
