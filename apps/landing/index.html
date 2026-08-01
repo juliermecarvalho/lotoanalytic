@@ -3,12 +3,106 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>LotoAnalytics | Análise estatística para loterias</title>
+    <title>LotoAnalytics | Gerar Jogos e Análise Estatística da Lotofácil</title>
     <meta
       name="description"
-      content="Monte jogos da Lotofácil com mais critério usando estatísticas, filtros, planilha premium, grupo VIP e gerador demonstrativo."
+      content="Gere jogos da Lotofácil e faça a análise estatística das dezenas: estratégia com filtros, padrões históricos e estudo de previsibilidade matemática, sem promessa de prêmio."
     />
+
+    <!-- Palavras-chave de foco: gerar jogos, análise, estratégia e previsibilidade matemática. -->
+    <meta
+      name="keywords"
+      content="gerar jogos lotofácil, análise de jogos lotofácil, estratégia lotofácil, análise estatística lotofácil, previsibilidade matemática loteria, filtros lotofácil, padrões lotofácil, conferidor lotofácil, dezenas mais frequentes, dezenas atrasadas"
+    />
+    <meta name="author" content="LotoAnalytics" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0e7c7b" />
+    <link rel="canonical" href="https://lotoanalytic.com.br/" />
+
+    <!-- Favicons, ícone da aplicação e manifest PWA. -->
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/icons/icon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/icons/icon-16.png" sizes="16x16" type="image/png" />
+    <link rel="apple-touch-icon" href="/icons/icon-180.png" sizes="180x180" />
+    <link rel="manifest" href="/icons/site.webmanifest" />
+
+    <!-- Open Graph: preview em redes sociais e apps de mensagem. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="LotoAnalytics" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:url" content="https://lotoanalytic.com.br/" />
+    <meta property="og:title" content="LotoAnalytics | Gerar Jogos e Análise Estatística da Lotofácil" />
+    <meta
+      property="og:description"
+      content="Gere jogos da Lotofácil com estratégia baseada em análise estatística, padrões históricos e estudo de previsibilidade matemática das dezenas."
+    />
+    <meta property="og:image" content="https://lotoanalytic.com.br/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="LotoAnalytics — gerador de jogos e análise estatística da Lotofácil" />
+
+    <!-- Twitter Cards. -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LotoAnalytics | Gerar Jogos e Análise Estatística da Lotofácil" />
+    <meta
+      name="twitter:description"
+      content="Estratégia e análise estatística para montar jogos da Lotofácil com critério: filtros, padrões e previsibilidade matemática."
+    />
+    <meta name="twitter:image" content="https://lotoanalytic.com.br/og-image.jpg" />
+
     <link rel="stylesheet" href="styles.css" />
+
+    <!-- Dados estruturados: site e FAQ para rich results no Google. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "LotoAnalytics",
+        "url": "https://lotoanalytic.com.br/",
+        "inLanguage": "pt-BR",
+        "description": "Gerador de jogos e análise estatística da Lotofácil — ferramenta livre e sempre gratuita, com filtros, padrões históricos e estudo de previsibilidade matemática das dezenas."
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Isso garante prêmio?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Não. O LotoAnalytics organiza dados, filtros e conferência, mas nenhum recurso garante resultado."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "O gerador aumenta minhas chances?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Não há promessa de aumento real de probabilidade. Ele ajuda a aplicar critérios e evitar montagem manual desorganizada."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Vai funcionar apenas para Lotofácil?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "O MVP começa pela Lotofácil. A marca já considera evolução para Mega-Sena, Quina e outras modalidades."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "O que acontece se eu não souber usar filtros?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "O gerador explica os critérios em linguagem prática e avisa quando um filtro fica restritivo demais."
+            }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <header class="site-header">
@@ -19,11 +113,8 @@
       <nav class="site-nav" aria-label="Navegação principal">
         <a href="#gerador">Gerador</a>
         <a href="#metodo">Método</a>
-        <a href="#planilha">Planilha</a>
-        <a href="#vip">VIP</a>
-        <a href="#precos">Preços</a>
       </nav>
-      <a class="header-cta" href="#precos">Quero acessar</a>
+      <a class="header-cta" href="#gerador">Gerar meus jogos</a>
     </header>
 
     <main id="top">
@@ -35,9 +126,9 @@
             O LotoAnalytics organiza estatísticas, filtros e conferência para você montar combinações com mais método,
             revisar padrões históricos e acompanhar seus jogos com transparência.
           </p>
+          <p class="free-badge">Ferramenta livre e sempre gratuita — sem cadastro e sem pagamento.</p>
           <div class="hero-actions">
-            <a class="primary-button" href="#gerador">Testar o gerador</a>
-            <a class="secondary-button" href="#precos">Ver planos</a>
+            <a class="primary-button" href="#gerador">Gerar meus jogos agora</a>
           </div>
           <p class="responsible-note">
             Aviso: loteria envolve sorte. O LotoAnalytics não garante prêmio, resultado ou aumento real de chance.
@@ -69,7 +160,7 @@
           </dl>
           <div class="panel-note">
             <strong>O que a página prova:</strong>
-            <span>você escolhe critérios, lê a grade analítica e entende os limites antes da oferta premium.</span>
+            <span>você escolhe critérios, lê a grade analítica e entende os limites antes de gerar seus jogos.</span>
           </div>
         </aside>
       </section>
@@ -85,22 +176,22 @@
         </div>
         <div>
           <strong>Prova prática</strong>
-          <span>O gerador demonstra a lógica antes da compra.</span>
+          <span>O gerador demonstra a lógica gratuitamente.</span>
         </div>
       </section>
 
       <section class="section generator-feature" id="gerador" aria-labelledby="generator-title">
         <div class="generator-copy">
           <p class="section-label">Prova prática</p>
-          <h2 id="generator-title">Teste o gerador antes de comprar</h2>
+          <h2 id="generator-title">Monte seus jogos no navegador</h2>
           <p>
-            Escolha poucos critérios e gere uma amostra. Se a combinação de filtros ficar estreita demais, o gerador avisa
+            Escolha poucos critérios e gere seus jogos. Se a combinação de filtros ficar estreita demais, o gerador avisa
             em vez de fingir que funcionou.
           </p>
           <ul class="proof-list">
             <li>Mostra jogos em formato pronto para copiar.</li>
             <li>Explica quando é melhor relaxar um filtro.</li>
-            <li>Reforça que a amostra não garante resultado.</li>
+            <li>Reforça que gerar jogos não garante resultado.</li>
           </ul>
         </div>
 
@@ -124,14 +215,44 @@
           </div>
           <p class="criteria-summary" id="criteria-summary">Critério atual: 3 jogos, 7 pares, soma mínima 170.</p>
           <div class="button-row">
-            <button id="generate-games" type="button">Gerar amostra</button>
+            <button id="generate-games" type="button">Gerar jogos</button>
             <button id="copy-games" type="button">Copiar</button>
             <button id="reset-generator" type="button">Limpar</button>
           </div>
-          <pre id="generated-games" aria-live="polite">Clique em gerar amostra para ver jogos com os critérios acima.</pre>
+          <pre id="generated-games" aria-live="polite">Clique em gerar jogos para ver as combinações com os critérios acima.</pre>
           <p class="generator-status" id="generator-status" role="status" aria-live="polite">
-            Amostra gratuita: até 5 jogos com filtros básicos.
+            Ferramenta livre e sem custo: monte quantos jogos quiser.
           </p>
+
+          <div class="volante-script" id="volante-script" hidden>
+            <h3>Script para marcar no volante da Caixa</h3>
+            <p>
+              Gere um script (bookmarklet) que marca as dezenas de um jogo no volante do site da Caixa, evitando erro na
+              escolha manual. Ele apenas <strong>marca os números</strong> — nunca confirma nem paga por você.
+            </p>
+            <div class="control-row">
+              <label for="script-game">Jogo</label>
+              <select id="script-game" aria-label="Jogo para gerar o script"></select>
+            </div>
+            <div class="button-row">
+              <button id="build-script" type="button">Gerar script do volante</button>
+              <button id="copy-script" type="button">Copiar script</button>
+            </div>
+            <textarea id="script-output" rows="4" readonly aria-label="Script do volante gerado"></textarea>
+            <details class="script-help">
+              <summary>Como usar o script</summary>
+              <ol>
+                <li>Clique em <strong>Gerar script do volante</strong> e depois em <strong>Copiar script</strong>.</li>
+                <li>No navegador, crie um novo favorito e cole o script no campo de endereço/URL do favorito.</li>
+                <li>Abra o volante da Lotofácil no site da Caixa e clique nesse favorito.</li>
+                <li>Confira as dezenas marcadas e só então confirme e pague você mesmo.</li>
+              </ol>
+              <p class="script-note">
+                Aviso: é um recurso de conveniência e pode parar de funcionar se o site da Caixa mudar. Sempre revise o
+                volante antes de confirmar.
+              </p>
+            </details>
+          </div>
         </div>
       </section>
 
@@ -152,7 +273,7 @@
           <article>
             <span>Gerar</span>
             <h3>Crie combinações com limites claros</h3>
-            <p>O gerador demonstra a lógica; a planilha premium amplia filtros, escala e conferência.</p>
+            <p>O gerador aplica os critérios escolhidos e monta as combinações com limites claros.</p>
           </article>
           <article>
             <span>Conferir</span>
@@ -160,113 +281,6 @@
             <p>Depois do sorteio, cole o resultado e veja acertos com leitura rápida e organizada.</p>
           </article>
         </div>
-      </section>
-
-      <section class="section two-column" id="planilha">
-        <div>
-          <p class="section-label">Produto inicial</p>
-          <h2>Planilha Premium para analisar, filtrar e conferir</h2>
-          <p>
-            A primeira entrega paga será uma planilha pronta para uso, com histórico, indicadores, gerador, conferidor e
-            dashboard. Ela valida a oferta antes de investir em um app completo.
-          </p>
-        </div>
-        <div class="feature-grid">
-          <article class="feature-card">
-            <h3>Histórico e frequência</h3>
-            <p>Veja dezenas mais frequentes, atrasadas e comportamento nos últimos concursos.</p>
-          </article>
-          <article class="feature-card">
-            <h3>Filtros de jogo</h3>
-            <p>Combine pares, ímpares, soma, repetidas, sequências, moldura e miolo.</p>
-          </article>
-          <article class="feature-card">
-            <h3>Conferência rápida</h3>
-            <p>Cole seus jogos, informe o resultado e veja os acertos com destaque visual.</p>
-          </article>
-          <article class="feature-card">
-            <h3>Dashboard claro</h3>
-            <p>Acompanhe o último concurso e os critérios sugeridos para a próxima análise.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="section vip-section" id="vip">
-        <div class="section-heading">
-          <p class="section-label">Rotina recorrente</p>
-          <h2>Grupo VIP para quem quer acompanhamento por concurso</h2>
-          <p>
-            O VIP transforma a planilha em rotina: análise antes do sorteio, filtros explicados, jogos com critérios e
-            conferência depois do resultado.
-          </p>
-        </div>
-        <ol class="timeline">
-          <li>
-            <span>Antes</span>
-            <strong>Leitura pré-concurso</strong>
-            <p>Resumo do último resultado, frequências recentes e filtros sugeridos.</p>
-          </li>
-          <li>
-            <span>Durante</span>
-            <strong>Jogos com critério</strong>
-            <p>Listas geradas com explicação do método, sem promessa de acerto.</p>
-          </li>
-          <li>
-            <span>Depois</span>
-            <strong>Conferência e ajuste</strong>
-            <p>Leitura dos acertos, dúvidas reais e melhoria contínua da estratégia.</p>
-          </li>
-        </ol>
-      </section>
-
-      <section class="section pricing-section" id="precos">
-        <div class="section-heading">
-          <p class="section-label">Oferta inicial</p>
-          <h2>Comece pela planilha, pelo VIP ou pelo combo</h2>
-          <p>
-            Os valores abaixo validam o MVP. A entrega inicial pode ser manual por e-mail ou mensagem enquanto a operação
-            de pagamento é definida.
-          </p>
-        </div>
-        <div class="pricing-grid">
-          <article class="price-card">
-            <h3>Planilha Premium</h3>
-            <p class="price">R$ 47</p>
-            <p>Pagamento único para acessar planilha, conferidor e gerador básico.</p>
-            <ul>
-              <li>Histórico e frequência</li>
-              <li>Filtros principais da Lotofácil</li>
-              <li>Conferência automática</li>
-            </ul>
-            <a href="mailto:contato@lotoanalytics.com?subject=Quero%20a%20Planilha%20Premium">Comprar planilha</a>
-          </article>
-          <article class="price-card featured">
-            <span class="plan-badge">Melhor para rotina</span>
-            <h3>Combo Completo</h3>
-            <p class="price">R$ 67</p>
-            <p>Planilha premium mais primeiro mês de grupo VIP para os primeiros usuários.</p>
-            <ul>
-              <li>Planilha + conferidor</li>
-              <li>Primeiro mês no VIP</li>
-              <li>Relatórios e filtros explicados</li>
-            </ul>
-            <a href="mailto:contato@lotoanalytics.com?subject=Quero%20o%20Combo%20Completo">Quero o combo</a>
-          </article>
-          <article class="price-card">
-            <h3>Grupo VIP</h3>
-            <p class="price">R$ 19,90/mês</p>
-            <p>Análises por concurso, jogos filtrados, atualizações e explicações.</p>
-            <ul>
-              <li>Análise antes do concurso</li>
-              <li>Conferência depois do sorteio</li>
-              <li>Dicas semanais de uso</li>
-            </ul>
-            <a href="mailto:contato@lotoanalytics.com?subject=Quero%20entrar%20no%20Grupo%20VIP">Entrar no VIP</a>
-          </article>
-        </div>
-        <p class="payment-note">
-          Se o botão abrir seu e-mail, envie a mensagem pronta. Caso não abra, escreva para contato@lotoanalytics.com.
-        </p>
       </section>
 
       <section class="section faq-section">
@@ -287,18 +301,14 @@
             <p>O MVP começa pela Lotofácil. A marca já considera evolução para Mega-Sena, Quina e outras modalidades.</p>
           </details>
           <details>
-            <summary>Como recebo a planilha?</summary>
-            <p>A entrega inicial pode ser feita por link do Google Sheets após a confirmação do pagamento.</p>
-          </details>
-          <details>
             <summary>O que acontece se eu não souber usar filtros?</summary>
-            <p>A planilha e o VIP devem explicar os critérios em linguagem prática, com exemplos e rotina por concurso.</p>
+            <p>O gerador explica os critérios em linguagem prática e avisa quando um filtro fica restritivo demais.</p>
           </details>
         </div>
       </section>
     </main>
 
-    <a class="mobile-sticky-cta" href="#gerador">Testar gerador</a>
+    <a class="mobile-sticky-cta" href="#gerador">Gerar jogos</a>
 
     <footer class="site-footer">
       <strong>LotoAnalytics</strong>
