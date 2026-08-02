@@ -15,7 +15,6 @@ import {
   LogOut,
   RefreshCw,
   ShieldCheck,
-  TicketCheck,
   UserCircle
 } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
@@ -205,6 +204,20 @@ function NotFoundPage() {
   );
 }
 
+// Marca do LotoAnalytics: mesmo logo do favicon (barras de analise + bola da sorte).
+function BrandLogo() {
+  return (
+    <svg width={22} height={22} viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+      <rect x="2" y="2" width="44" height="44" rx="11" fill="#1F6F8B" />
+      <rect x="11" y="26" width="6" height="11" rx="2" fill="#ffffff" />
+      <rect x="21" y="21" width="6" height="16" rx="2" fill="#ffffff" />
+      <rect x="31" y="16" width="6" height="21" rx="2" fill="#ffffff" opacity="0.92" />
+      <circle cx="34" cy="13" r="5" fill="#F6C445" />
+      <circle cx="32.3" cy="11.3" r="1.5" fill="#ffffff" opacity="0.85" />
+    </svg>
+  );
+}
+
 function Shell() {
   const { state, setState, authService } = useAppState();
   const isAdmin = hasRole(state.currentUser, "administrador");
@@ -237,7 +250,7 @@ function Shell() {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <TicketCheck aria-hidden="true" size={22} />
+          <BrandLogo />
           <strong>LotoAnalytics</strong>
         </div>
         <nav aria-label="Principal">
