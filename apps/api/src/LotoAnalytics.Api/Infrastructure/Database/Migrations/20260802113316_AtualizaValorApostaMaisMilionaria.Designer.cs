@@ -3,6 +3,7 @@ using System;
 using LotoAnalytics.Api.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LotoAnalytics.Api.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(LotoAnalyticsDbContext))]
-    partial class LotoAnalyticsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260802113316_AtualizaValorApostaMaisMilionaria")]
+    partial class AtualizaValorApostaMaisMilionaria
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

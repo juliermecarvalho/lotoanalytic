@@ -44,6 +44,14 @@ public sealed class LotofacilDashboardController(LotoAnalyticsDbContext dbContex
                 PreferredSumLowerBound = 120,
                 PreferredSumUpperBound = 190,
                 IncludeGrid = false
+            },
+            ["maismilionaria"] = new()
+            {
+                // Sorteio da +Milionaria traz 6 dezenas de 01 a 50; a soma media fica em torno de 153.
+                Board = MaisMilionariaGameGenerator.Board,
+                PreferredSumLowerBound = 120,
+                PreferredSumUpperBound = 190,
+                IncludeGrid = false
             }
         };
 
@@ -76,11 +84,66 @@ public sealed class LotofacilDashboardController(LotoAnalyticsDbContext dbContex
         var config = BoardConfigs.GetValueOrDefault(codigoModalidade, LotofacilDashboardAggregator.LotofacilConfig);
         var snapshot = LotofacilDashboardAggregator.Aggregate(orderedDraws, config);
 
-        return Ok(MapToResponse(codigoModalidade, snapshot));
+        var trevos = await LoadTrevoFrequenciesAsync(codigoModalidade, cancellationToken);
+
+        return Ok(MapToResponse(codigoModalidade, snapshot, trevos));
+    }
+
+    // Calcula a frequencia dos trevos (01-06) para modalidades que os sorteiam (ex.: +Milionaria).
+    // Retorna null quando a modalidade nao tem trevos registrados, mantendo o painel das demais intacto.
+    private async Task<IReadOnlyList<DashboardTrevoFrequencyResponse>?> LoadTrevoFrequenciesAsync(
+        string codigoModalidade,
+        CancellationToken cancellationToken)
+    {
+        var trevoDraws = await dbContext.Contests
+            .AsNoTracking()
+            .Where(contest => contest.LotteryMode!.Code == codigoModalidade)
+            .Where(contest => contest.Numbers.Any(number => number.NumberType == "trevo" && number.NumericValue != null))
+            .OrderBy(contest => contest.Number)
+            .Select(contest => new
+            {
+                contest.Number,
+                Trevos = contest.Numbers
+                    .Where(number => number.NumberType == "trevo" && number.NumericValue != null)
+                    .Select(number => number.NumericValue!.Value)
+                    .ToArray()
+            })
+            .ToArrayAsync(cancellationToken);
+
+        if (trevoDraws.Length == 0)
+        {
+            return null;
+        }
+
+        var totalDraws = trevoDraws.Length;
+        var latestContest = trevoDraws[^1].Number;
+
+        return Enumerable
+            .Range(1, 6)
+            .Select(trevo =>
+            {
+                var appearances = trevoDraws.Where(draw => draw.Trevos.Contains(trevo)).ToArray();
+                var count = appearances.Length;
+                int? lastContest = appearances.Length > 0 ? appearances[^1].Number : null;
+                // Atraso: quantos concursos com trevos ja ocorreram desde a ultima aparicao do trevo.
+                var delay = lastContest is null
+                    ? totalDraws
+                    : trevoDraws.Count(draw => draw.Number > lastContest.Value);
+                return new DashboardTrevoFrequencyResponse(
+                    trevo,
+                    count,
+                    totalDraws > 0 ? (double)count / totalDraws * 100 : 0,
+                    delay,
+                    lastContest);
+            })
+            .ToArray();
     }
 
     // Traduz o snapshot calculado para o contrato JSON exposto ao frontend.
-    private static DashboardResponse MapToResponse(string modeCode, DashboardSnapshot snapshot)
+    private static DashboardResponse MapToResponse(
+        string modeCode,
+        DashboardSnapshot snapshot,
+        IReadOnlyList<DashboardTrevoFrequencyResponse>? trevos)
     {
         var latest = snapshot.LatestContest is null
             ? null
@@ -115,7 +178,8 @@ public sealed class LotofacilDashboardController(LotoAnalyticsDbContext dbContex
                 snapshot.Summary.UniqueCombinationsPercentage,
                 snapshot.Summary.PreferredSumPercentage),
             Frequencies: frequencies,
-            Categories: categories);
+            Categories: categories,
+            Trevos: trevos);
     }
 }
 
@@ -125,7 +189,15 @@ public sealed record DashboardResponse(
     [property: JsonPropertyName("ultimoConcurso")] DashboardLatestContestResponse? LatestContest,
     [property: JsonPropertyName("resumo")] DashboardSummaryResponse Summary,
     [property: JsonPropertyName("frequencias")] IReadOnlyList<DashboardFrequencyResponse> Frequencies,
-    [property: JsonPropertyName("categorias")] IReadOnlyDictionary<string, IReadOnlyList<DashboardCategoryItemResponse>> Categories);
+    [property: JsonPropertyName("categorias")] IReadOnlyDictionary<string, IReadOnlyList<DashboardCategoryItemResponse>> Categories,
+    [property: JsonPropertyName("trevos")] IReadOnlyList<DashboardTrevoFrequencyResponse>? Trevos = null);
+
+public sealed record DashboardTrevoFrequencyResponse(
+    [property: JsonPropertyName("trevo")] int Trevo,
+    [property: JsonPropertyName("quantidade")] int Count,
+    [property: JsonPropertyName("percentual")] double Percentage,
+    [property: JsonPropertyName("atraso")] int Delay,
+    [property: JsonPropertyName("ultimoConcurso")] int? LastContest);
 
 public sealed record DashboardSummaryResponse(
     [property: JsonPropertyName("somaMedia")] double AverageSum,

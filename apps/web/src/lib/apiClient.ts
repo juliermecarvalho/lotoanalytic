@@ -29,6 +29,7 @@ export type SumRangeFilter = {
 export type GenerateGamesRequest = {
   quantidadeJogos: number;
   dezenasPorJogo: number;
+  trevosPorJogo?: number;
   dezenasObrigatorias: string[];
   dezenasExcluidas: string[];
   dezenasAnteriores?: string[];
@@ -110,6 +111,23 @@ export type GeneratedDuplaSenaGame = {
 
 export type GenerateDuplaSenaGamesResponse = {
   jogos: GeneratedDuplaSenaGame[];
+  combinacoesTestadas: number;
+};
+
+// Jogo gerado da +Milionaria: 6-12 dezenas principais (01-50) mais os trevos sorteados (01-06).
+export type GeneratedMaisMilionariaGame = {
+  dezenas: string[];
+  trevos: string[];
+  quantidadePares: number;
+  quantidadeImpares: number;
+  somaDezenas: number;
+  quantidadeRepetidas: number;
+  quantidadePrimos: number;
+  maiorSequencia: number;
+};
+
+export type GenerateMaisMilionariaGamesResponse = {
+  jogos: GeneratedMaisMilionariaGame[];
   combinacoesTestadas: number;
 };
 
@@ -213,6 +231,15 @@ export type DashboardLatestContest = {
   repetidasAnterior: number;
 };
 
+// Frequencia de um trevo (01-06) no painel de modalidades com trevos (ex.: +Milionaria).
+export type DashboardTrevoFrequency = {
+  trevo: number;
+  quantidade: number;
+  percentual: number;
+  atraso: number;
+  ultimoConcurso: number | null;
+};
+
 export type DashboardResponse = {
   codigoModalidade: string;
   totalConcursos: number;
@@ -220,6 +247,7 @@ export type DashboardResponse = {
   resumo: DashboardSummary;
   frequencias: DashboardFrequency[];
   categorias: Record<string, Array<{ valor: number; quantidade: number }>>;
+  trevos?: DashboardTrevoFrequency[] | null;
 };
 
 export type ContestImportResponse = {

@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 import {
   ChevronDown,
+  Clover,
   Dices,
   Grid3x3,
   Layers,
@@ -42,12 +43,14 @@ import { GeneratorMegaSena } from "./features/generator/GeneratorMegaSena";
 import { GeneratorQuina } from "./features/generator/GeneratorQuina";
 import { GeneratorDuplaSena } from "./features/generator/GeneratorDuplaSena";
 import { GeneratorLotomania } from "./features/generator/GeneratorLotomania";
+import { GeneratorMaisMilionaria } from "./features/generator/GeneratorMaisMilionaria";
 import { PrivacyPolicyPage } from "./features/legal/PrivacyPolicyPage";
 import { DashboardLotofacil } from "./features/dashboard/DashboardLotofacil";
 import { DashboardMegaSena } from "./features/dashboard/DashboardMegaSena";
 import { DashboardQuina } from "./features/dashboard/DashboardQuina";
 import { DashboardDuplaSena } from "./features/dashboard/DashboardDuplaSena";
 import { DashboardLotomania } from "./features/dashboard/DashboardLotomania";
+import { DashboardMaisMilionaria } from "./features/dashboard/DashboardMaisMilionaria";
 import { AdBlockGate } from "./features/adblock/AdBlockGate";
 import "./styles.css";
 
@@ -127,6 +130,11 @@ function createAppRouter() {
     path: "/dashboard/lotomania",
     component: DashboardLotomania
   });
+  const dashboardMaisMilionariaRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/dashboard/mais-milionaria",
+    component: DashboardMaisMilionaria
+  });
   const generatorRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/gerar-jogos/lotofacil",
@@ -151,6 +159,11 @@ function createAppRouter() {
     getParentRoute: () => rootRoute,
     path: "/gerar-jogos/lotomania",
     component: GeneratorLotomania
+  });
+  const generatorMaisMilionariaRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/gerar-jogos/mais-milionaria",
+    component: GeneratorMaisMilionaria
   });
   const legacyGeneratorRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -215,11 +228,13 @@ function createAppRouter() {
     dashboardQuinaRoute,
     dashboardDuplaSenaRoute,
     dashboardLotomaniaRoute,
+    dashboardMaisMilionariaRoute,
     generatorRoute,
     generatorMegaSenaRoute,
     generatorQuinaRoute,
     generatorDuplaSenaRoute,
     generatorLotomaniaRoute,
+    generatorMaisMilionariaRoute,
     legacyGeneratorRoute,
     checkerRoute,
     historyRoute,
@@ -313,6 +328,9 @@ function Shell() {
           </Link>
           <Link to="/dashboard/lotomania" activeProps={{ className: "active" }}>
             <LayoutGrid size={18} /> Lotomania
+          </Link>
+          <Link to="/dashboard/mais-milionaria" activeProps={{ className: "active" }}>
+            <Clover size={18} /> +Milionária
           </Link>
         </nav>
       </aside>
