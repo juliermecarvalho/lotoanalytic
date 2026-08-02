@@ -36,6 +36,14 @@ public sealed class LotofacilDashboardController(LotoAnalyticsDbContext dbContex
                 PreferredSumLowerBound = 880,
                 PreferredSumUpperBound = 1100,
                 IncludeGrid = false
+            },
+            ["dupla_sena"] = new()
+            {
+                // Sorteio da Dupla Sena traz 6 dezenas de 01 a 50; a soma media fica em torno de 153.
+                Board = DuplaSenaGameGenerator.Board,
+                PreferredSumLowerBound = 120,
+                PreferredSumUpperBound = 190,
+                IncludeGrid = false
             }
         };
 

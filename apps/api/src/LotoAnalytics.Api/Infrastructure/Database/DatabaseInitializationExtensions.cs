@@ -21,7 +21,7 @@ public static class DatabaseInitializationExtensions
     }
 
     // Modalidades com estatisticas de filtro calibradas que devem ser preenchidas no startup.
-    private static readonly string[] FilterStatisticsModes = ["lotofacil", "mega_sena", "quina", "lotomania"];
+    private static readonly string[] FilterStatisticsModes = ["lotofacil", "mega_sena", "quina", "lotomania", "dupla_sena"];
 
     // Preenche as estatisticas de filtro quando ja existem concursos mas a tabela nunca foi calculada.
     private static async Task BackfillFilterStatisticsAsync(IServiceProvider services, LotoAnalyticsDbContext dbContext)

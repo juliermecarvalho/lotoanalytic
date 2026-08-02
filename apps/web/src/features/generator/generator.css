@@ -633,6 +633,11 @@
   grid-template-columns: repeat(10, 34px);
 }
 
+/* Volante da Dupla Sena: 50 dezenas dispostas em 10 colunas. */
+.gen-board--dupla-sena {
+  grid-template-columns: repeat(10, 34px);
+}
+
 .gen-cell {
   background: #ffffff;
   border: 1px solid #bcccdc;
@@ -1207,6 +1212,11 @@
   }
 
   .gen-board--lotomania {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+  }
+
+  /* O volante da Dupla Sena mantem 10 colunas fluidas no mobile. */
+  .gen-board--dupla-sena {
     grid-template-columns: repeat(10, minmax(0, 1fr));
   }
 

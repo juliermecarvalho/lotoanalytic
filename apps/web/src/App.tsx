@@ -12,6 +12,7 @@ import {
   ChevronDown,
   Dices,
   Grid3x3,
+  Layers,
   LayoutDashboard,
   LayoutGrid,
   LogOut,
@@ -39,11 +40,13 @@ import { AuthService, AuthSession, keycloakAuthService } from "./lib/auth";
 import { GeneratorLotofacil } from "./features/generator/GeneratorLotofacil";
 import { GeneratorMegaSena } from "./features/generator/GeneratorMegaSena";
 import { GeneratorQuina } from "./features/generator/GeneratorQuina";
+import { GeneratorDuplaSena } from "./features/generator/GeneratorDuplaSena";
 import { GeneratorLotomania } from "./features/generator/GeneratorLotomania";
 import { PrivacyPolicyPage } from "./features/legal/PrivacyPolicyPage";
 import { DashboardLotofacil } from "./features/dashboard/DashboardLotofacil";
 import { DashboardMegaSena } from "./features/dashboard/DashboardMegaSena";
 import { DashboardQuina } from "./features/dashboard/DashboardQuina";
+import { DashboardDuplaSena } from "./features/dashboard/DashboardDuplaSena";
 import { DashboardLotomania } from "./features/dashboard/DashboardLotomania";
 import { AdBlockGate } from "./features/adblock/AdBlockGate";
 import "./styles.css";
@@ -114,6 +117,11 @@ function createAppRouter() {
     path: "/dashboard/quina",
     component: DashboardQuina
   });
+  const dashboardDuplaSenaRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/dashboard/dupla-sena",
+    component: DashboardDuplaSena
+  });
   const dashboardLotomaniaRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/dashboard/lotomania",
@@ -133,6 +141,11 @@ function createAppRouter() {
     getParentRoute: () => rootRoute,
     path: "/gerar-jogos/quina",
     component: GeneratorQuina
+  });
+  const generatorDuplaSenaRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/gerar-jogos/dupla-sena",
+    component: GeneratorDuplaSena
   });
   const generatorLotomaniaRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -200,10 +213,12 @@ function createAppRouter() {
     dashboardLotofacilRoute,
     dashboardMegaSenaRoute,
     dashboardQuinaRoute,
+    dashboardDuplaSenaRoute,
     dashboardLotomaniaRoute,
     generatorRoute,
     generatorMegaSenaRoute,
     generatorQuinaRoute,
+    generatorDuplaSenaRoute,
     generatorLotomaniaRoute,
     legacyGeneratorRoute,
     checkerRoute,
@@ -292,6 +307,9 @@ function Shell() {
           </Link>
           <Link to="/dashboard/quina" activeProps={{ className: "active" }}>
             <Grid3x3 size={18} /> Quina
+          </Link>
+          <Link to="/dashboard/dupla-sena" activeProps={{ className: "active" }}>
+            <Layers size={18} /> Dupla Sena
           </Link>
           <Link to="/dashboard/lotomania" activeProps={{ className: "active" }}>
             <LayoutGrid size={18} /> Lotomania

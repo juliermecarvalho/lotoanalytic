@@ -97,6 +97,22 @@ export type GenerateQuinaGamesResponse = {
   combinacoesTestadas: number;
 };
 
+// Jogo gerado da Dupla Sena: sem moldura (a cartela 10x5 nao tem esse conceito).
+export type GeneratedDuplaSenaGame = {
+  dezenas: string[];
+  quantidadePares: number;
+  quantidadeImpares: number;
+  somaDezenas: number;
+  quantidadeRepetidas: number;
+  quantidadePrimos: number;
+  maiorSequencia: number;
+};
+
+export type GenerateDuplaSenaGamesResponse = {
+  jogos: GeneratedDuplaSenaGame[];
+  combinacoesTestadas: number;
+};
+
 // Aposta gerada da Lotomania: 50 dezenas de 00 a 99, sem moldura (a cartela 10x10 nao tem esse conceito).
 export type GeneratedLotomaniaGame = {
   dezenas: string[];
