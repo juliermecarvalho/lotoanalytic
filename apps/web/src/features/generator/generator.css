@@ -868,10 +868,10 @@
 }
 
 .gen-btn-regen {
-  background: #ffffff;
+  background: #1f6f8b;
   border: 1px solid #1f6f8b;
   border-radius: 7px;
-  color: #1f6f8b;
+  color: #ffffff;
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
@@ -881,7 +881,8 @@
 }
 
 .gen-btn-regen:hover {
-  background: #f7fafc;
+  background: #185a72;
+  border-color: #185a72;
 }
 
 .gen-legend {
