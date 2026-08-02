@@ -3,7 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Favicon embutido como data URI: o nginx serve o SPA em /spa-assets/ e a raiz
+         cai no fallback do index.html, entao um /favicon.svg externo nao e servido. -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCI+PHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjQ0IiBoZWlnaHQ9IjQ0IiByeD0iMTEiIGZpbGw9IiMxRjZGOEIiLz48cmVjdCB4PSIxMSIgeT0iMjYiIHdpZHRoPSI2IiBoZWlnaHQ9IjExIiByeD0iMiIgZmlsbD0iI2ZmZiIvPjxyZWN0IHg9IjIxIiB5PSIyMSIgd2lkdGg9IjYiIGhlaWdodD0iMTYiIHJ4PSIyIiBmaWxsPSIjZmZmIi8+PHJlY3QgeD0iMzEiIHk9IjE2IiB3aWR0aD0iNiIgaGVpZ2h0PSIyMSIgcng9IjIiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii45MiIvPjxjaXJjbGUgY3g9IjM0IiBjeT0iMTMiIHI9IjUiIGZpbGw9IiNGNkM0NDUiLz48Y2lyY2xlIGN4PSIzMi4zIiBjeT0iMTEuMyIgcj0iMS41IiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuODUiLz48L3N2Zz4="
+    />
     <!-- Google AdSense: tag de protecao contra erros da recuperacao de bloqueio de anuncios.
          Deve vir ANTES das demais tags no <head> (recomendacao do Google). -->
     <script>(function(){'use strict';var aa=typeof Object.create=="function"?Object.create:function(a){function b(){}b.prototype=a;return new b},ba=typeof Object.defineProperties=="function"?Object.defineProperty:function(a,b,c){if(a==Array.prototype||a==Object.prototype)return a;a[b]=c.value;return a};
