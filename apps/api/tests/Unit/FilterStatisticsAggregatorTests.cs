@@ -1,4 +1,5 @@
 using LotoAnalytics.Api.Features.FilterStatistics;
+using LotoAnalytics.Api.Features.GameGeneration;
 using Shouldly;
 using Xunit;
 
@@ -49,6 +50,40 @@ public sealed class FilterStatisticsAggregatorTests
         CountOf(buckets, "sequencia", 15).ShouldBe(1);
         CountOf(buckets, "sequencia", 3).ShouldBe(1);
         CountOf(buckets, "sequencia", 6).ShouldBe(1);
+    }
+
+    [Fact]
+    public void AggregateForMegaSenaComputesBoardMetricsWithoutBorderOrGrid()
+    {
+        int[][] megaDraws =
+        [
+            [1, 2, 3, 4, 5, 6],
+            [10, 20, 30, 40, 50, 60]
+        ];
+
+        var buckets = FilterStatisticsAggregator.Aggregate(megaDraws, MegaSenaGameGenerator.Board, includeGrid: false);
+
+        // Paridade: sorteio 1 tem 3 pares; sorteio 2 tem 6 pares.
+        CountOf(buckets, "paridade", 3).ShouldBe(1);
+        CountOf(buckets, "paridade", 6).ShouldBe(1);
+
+        // Primos ate 60: sorteio 1 tem {2,3,5} = 3 primos; sorteio 2 nao tem primos.
+        CountOf(buckets, "primos", 3).ShouldBe(1);
+        CountOf(buckets, "primos", 0).ShouldBe(1);
+
+        CountOf(buckets, "soma", 21).ShouldBe(1);
+        CountOf(buckets, "soma", 210).ShouldBe(1);
+
+        // Sequencia: sorteio 1 e uma corrida de 6; sorteio 2 nao tem consecutivos.
+        CountOf(buckets, "sequencia", 6).ShouldBe(1);
+        CountOf(buckets, "sequencia", 1).ShouldBe(1);
+
+        // Repeticao: nenhuma dezena do sorteio 2 aparece no sorteio 1.
+        CountOf(buckets, "repeticao", 0).ShouldBe(1);
+
+        // A Mega-Sena nao tem moldura nem estatistica de grade.
+        SumOf(buckets, "moldura").ShouldBe(0);
+        SumOf(buckets, "grade").ShouldBe(0);
     }
 
     [Fact]

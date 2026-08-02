@@ -9,14 +9,14 @@ using Microsoft.EntityFrameworkCore;
 namespace LotoAnalytics.Api.Features.GameGeneration;
 
 [ApiController]
-[Route("gerador/lotofacil")]
-public sealed class LotofacilGameGenerationController(IServiceProvider serviceProvider) : ControllerBase
+[Route("gerador/mega-sena")]
+public sealed class MegaSenaGameGenerationController(IServiceProvider serviceProvider) : ControllerBase
 {
-    // Gera jogos da Lotofacil usando os filtros estatisticos informados no corpo da requisicao.
+    // Gera jogos da Mega-Sena usando os filtros estatisticos informados no corpo da requisicao.
     [AllowAnonymous]
     [HttpPost("gerar")]
-    public async Task<ActionResult<LotofacilGameGenerationResponse>> Generate(
-        [FromBody] GenerateLotofacilGamesRequest request,
+    public async Task<ActionResult<MegaSenaGameGenerationResponse>> Generate(
+        [FromBody] GenerateMegaSenaGamesRequest request,
         CancellationToken cancellationToken)
     {
         try
@@ -25,7 +25,7 @@ public sealed class LotofacilGameGenerationController(IServiceProvider servicePr
                 ? await LoadDrawnGameKeysAsync(cancellationToken)
                 : null;
 
-            var result = LotofacilGameGenerator.Generate(new LotofacilGameGenerationRequest
+            var result = MegaSenaGameGenerator.Generate(new MegaSenaGameGenerationRequest
             {
                 GameCount = request.GameCount,
                 NumbersPerGame = request.NumbersPerGame,
@@ -43,8 +43,6 @@ public sealed class LotofacilGameGenerationController(IServiceProvider servicePr
                 MaximumRepeated = request.MaximumRepeated,
                 MinimumPrimes = request.MinimumPrimes,
                 MaximumPrimes = request.MaximumPrimes,
-                MinimumBorder = request.MinimumBorder,
-                MaximumBorder = request.MaximumBorder,
                 MinimumPerRowColumn = request.MinimumPerRowColumn,
                 MaximumPerRowColumn = request.MaximumPerRowColumn,
                 MaximumSequence = request.MaximumSequence,
@@ -60,14 +58,14 @@ public sealed class LotofacilGameGenerationController(IServiceProvider servicePr
                     .ToArray();
                 await historyService.SaveAsync(
                     currentUser.User.Id,
-                    "lotofacil",
+                    "mega_sena",
                     request.NumbersPerGame,
                     request,
                     summaries,
                     cancellationToken);
             }
 
-            return Ok(new LotofacilGameGenerationResponse(
+            return Ok(new MegaSenaGameGenerationResponse(
                 Games: result.Games.Select(MapGeneratedGame).ToArray(),
                 AttemptCount: result.AttemptCount));
         }
@@ -84,47 +82,46 @@ public sealed class LotofacilGameGenerationController(IServiceProvider servicePr
         return await synchronizer.SynchronizeAsync(User, cancellationToken);
     }
 
-    // Carrega as chaves dos sorteios ja registrados da Lotofacil para gerar apenas jogos ineditos.
+    // Carrega as chaves dos sorteios ja registrados da Mega-Sena para gerar apenas jogos ineditos.
     private async Task<IReadOnlySet<string>> LoadDrawnGameKeysAsync(CancellationToken cancellationToken)
     {
         var dbContext = serviceProvider.GetRequiredService<LotoAnalyticsDbContext>();
         var drawnNumbers = await dbContext.ContestNumbers
             .AsNoTracking()
             .Where(number => number.NumberType == "principal" &&
-                number.Contest!.LotteryMode!.Code == "lotofacil" &&
+                number.Contest!.LotteryMode!.Code == "mega_sena" &&
                 number.NumericValue != null)
             .Select(number => new { number.ContestId, number.NumericValue })
             .ToArrayAsync(cancellationToken);
 
         return drawnNumbers
             .GroupBy(number => number.ContestId)
-            .Select(group => LotofacilGameGenerator.FormatGameKey(group.Select(number => number.NumericValue!.Value).ToArray()))
+            .Select(group => MegaSenaGameGenerator.FormatGameKey(group.Select(number => number.NumericValue!.Value).ToArray()))
             .ToHashSet(StringComparer.Ordinal);
     }
 
     // Converte o jogo gerado para o contrato HTTP em PT-BR.
-    private static GeneratedGameResponse MapGeneratedGame(GeneratedLotofacilGame game)
+    private static GeneratedMegaSenaGameResponse MapGeneratedGame(GeneratedMegaSenaGame game)
     {
-        return new GeneratedGameResponse(
+        return new GeneratedMegaSenaGameResponse(
             Numbers: game.Numbers,
             EvenCount: game.EvenCount,
             OddCount: game.OddCount,
             NumbersSum: game.NumbersSum,
             RepeatedFromPreviousCount: game.RepeatedFromPreviousCount,
             PrimeCount: game.PrimeCount,
-            BorderCount: game.BorderCount,
             LongestSequence: game.LongestSequence);
     }
 }
 
-public sealed record GenerateLotofacilGamesRequest
+public sealed record GenerateMegaSenaGamesRequest
 {
     [JsonPropertyName("quantidadeJogos")]
     [Range(1, 100)]
     public int GameCount { get; init; }
 
     [JsonPropertyName("dezenasPorJogo")]
-    [Range(15, 20)]
+    [Range(6, 20)]
     public int NumbersPerGame { get; init; }
 
     [JsonPropertyName("dezenasObrigatorias")]
@@ -137,78 +134,65 @@ public sealed record GenerateLotofacilGamesRequest
     public IReadOnlyList<string> PreviousNumbers { get; init; } = [];
 
     [JsonPropertyName("quantidadePares")]
-    [Range(0, 16)]
+    [Range(0, 20)]
     public int? EvenCount { get; init; }
 
     [JsonPropertyName("quantidadeImpares")]
-    [Range(0, 16)]
+    [Range(0, 20)]
     public int? OddCount { get; init; }
 
     [JsonPropertyName("somaMinima")]
-    [Range(0, 400)]
+    [Range(0, 1200)]
     public int? MinimumSum { get; init; }
 
     [JsonPropertyName("somaMaxima")]
-    [Range(0, 400)]
+    [Range(0, 1200)]
     public int? MaximumSum { get; init; }
 
     [JsonPropertyName("faixasSoma")]
     public IReadOnlyList<SumRangeRequest> SumRanges { get; init; } = [];
 
     [JsonPropertyName("repetidasMinima")]
-    [Range(0, 16)]
+    [Range(0, 20)]
     public int? MinimumRepeated { get; init; }
 
     [JsonPropertyName("repetidasMaxima")]
-    [Range(0, 16)]
+    [Range(0, 20)]
     public int? MaximumRepeated { get; init; }
 
     [JsonPropertyName("primosMinimo")]
-    [Range(0, 9)]
+    [Range(0, 17)]
     public int? MinimumPrimes { get; init; }
 
     [JsonPropertyName("primosMaximo")]
-    [Range(0, 9)]
+    [Range(0, 17)]
     public int? MaximumPrimes { get; init; }
 
-    [JsonPropertyName("molduraMinima")]
-    [Range(0, 16)]
-    public int? MinimumBorder { get; init; }
-
-    [JsonPropertyName("molduraMaxima")]
-    [Range(0, 16)]
-    public int? MaximumBorder { get; init; }
-
     [JsonPropertyName("linhaColunaMinima")]
-    [Range(0, 5)]
+    [Range(0, 20)]
     public int? MinimumPerRowColumn { get; init; }
 
     [JsonPropertyName("linhaColunaMaxima")]
-    [Range(0, 5)]
+    [Range(0, 20)]
     public int? MaximumPerRowColumn { get; init; }
 
     [JsonPropertyName("sequenciaMaxima")]
-    [Range(1, 16)]
+    [Range(1, 20)]
     public int? MaximumSequence { get; init; }
 
     [JsonPropertyName("apenasIneditos")]
     public bool OnlyUnseenGames { get; init; }
 }
 
-public sealed record SumRangeRequest(
-    [property: JsonPropertyName("somaMinima")] int MinimumSum,
-    [property: JsonPropertyName("somaMaxima")] int MaximumSum);
-
-public sealed record LotofacilGameGenerationResponse(
-    [property: JsonPropertyName("jogos")] IReadOnlyList<GeneratedGameResponse> Games,
+public sealed record MegaSenaGameGenerationResponse(
+    [property: JsonPropertyName("jogos")] IReadOnlyList<GeneratedMegaSenaGameResponse> Games,
     [property: JsonPropertyName("combinacoesTestadas")] int AttemptCount);
 
-public sealed record GeneratedGameResponse(
+public sealed record GeneratedMegaSenaGameResponse(
     [property: JsonPropertyName("dezenas")] IReadOnlyList<string> Numbers,
     [property: JsonPropertyName("quantidadePares")] int EvenCount,
     [property: JsonPropertyName("quantidadeImpares")] int OddCount,
     [property: JsonPropertyName("somaDezenas")] int NumbersSum,
     [property: JsonPropertyName("quantidadeRepetidas")] int RepeatedFromPreviousCount,
     [property: JsonPropertyName("quantidadePrimos")] int PrimeCount,
-    [property: JsonPropertyName("quantidadeMoldura")] int BorderCount,
     [property: JsonPropertyName("maiorSequencia")] int LongestSequence);

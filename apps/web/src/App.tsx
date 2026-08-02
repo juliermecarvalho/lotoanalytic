@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 import {
   ChevronDown,
+  Dices,
   LayoutDashboard,
   LogOut,
   RefreshCw,
@@ -35,6 +36,7 @@ import {
 import { AppState, AppStateContext, useAppState } from "./lib/appState";
 import { AuthService, AuthSession, keycloakAuthService } from "./lib/auth";
 import { GeneratorLotofacil } from "./features/generator/GeneratorLotofacil";
+import { GeneratorMegaSena } from "./features/generator/GeneratorMegaSena";
 import { PrivacyPolicyPage } from "./features/legal/PrivacyPolicyPage";
 import { DashboardLotofacil } from "./features/dashboard/DashboardLotofacil";
 import { AdBlockGate } from "./features/adblock/AdBlockGate";
@@ -101,6 +103,11 @@ function createAppRouter() {
     path: "/gerar-jogos/lotofacil",
     component: GeneratorLotofacil
   });
+  const generatorMegaSenaRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/gerar-jogos/mega-sena",
+    component: GeneratorMegaSena
+  });
   const legacyGeneratorRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/gerador",
@@ -161,6 +168,7 @@ function createAppRouter() {
   const routeTree = rootRoute.addChildren([
     dashboardLotofacilRoute,
     generatorRoute,
+    generatorMegaSenaRoute,
     legacyGeneratorRoute,
     checkerRoute,
     historyRoute,
@@ -228,6 +236,9 @@ function Shell() {
         <nav aria-label="Principal">
           <Link to="/dashboard/lotofacil" activeProps={{ className: "active" }}>
             <LayoutDashboard size={18} /> Lotofácil
+          </Link>
+          <Link to="/gerar-jogos/mega-sena" activeProps={{ className: "active" }}>
+            <Dices size={18} /> Gerar Mega-Sena
           </Link>
         </nav>
       </aside>

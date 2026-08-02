@@ -20,26 +20,31 @@ public static class DatabaseInitializationExtensions
         await BackfillFilterStatisticsAsync(scope.ServiceProvider, dbContext);
     }
 
+    // Modalidades com estatisticas de filtro calibradas que devem ser preenchidas no startup.
+    private static readonly string[] FilterStatisticsModes = ["lotofacil", "mega_sena"];
+
     // Preenche as estatisticas de filtro quando ja existem concursos mas a tabela nunca foi calculada.
     private static async Task BackfillFilterStatisticsAsync(IServiceProvider services, LotoAnalyticsDbContext dbContext)
     {
-        const string modeCode = "lotofacil";
-
-        var hasStatistics = await dbContext.FilterStatistics
-            .AnyAsync(statistic => statistic.LotteryModeCode == modeCode);
-        if (hasStatistics)
-        {
-            return;
-        }
-
-        var hasContests = await dbContext.Contests
-            .AnyAsync(contest => contest.LotteryMode!.Code == modeCode);
-        if (!hasContests)
-        {
-            return;
-        }
-
         var refreshService = services.GetRequiredService<IFilterStatisticsRefreshService>();
-        await refreshService.RefreshAsync(modeCode, CancellationToken.None);
+
+        foreach (var modeCode in FilterStatisticsModes)
+        {
+            var hasStatistics = await dbContext.FilterStatistics
+                .AnyAsync(statistic => statistic.LotteryModeCode == modeCode);
+            if (hasStatistics)
+            {
+                continue;
+            }
+
+            var hasContests = await dbContext.Contests
+                .AnyAsync(contest => contest.LotteryMode!.Code == modeCode);
+            if (!hasContests)
+            {
+                continue;
+            }
+
+            await refreshService.RefreshAsync(modeCode, CancellationToken.None);
+        }
     }
 }

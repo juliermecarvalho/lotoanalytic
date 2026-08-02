@@ -1,20 +1,20 @@
 namespace LotoAnalytics.Api.Features.GameGeneration;
 
-public static class LotofacilGameGenerator
+public static class MegaSenaGameGenerator
 {
-    // Cartela oficial da Lotofacil: 25 dezenas, grade 5x5, primos ate 25 e miolo central 3x3 para a moldura.
+    // Cartela oficial da Mega-Sena: 60 dezenas, grade 10x6, primos ate 60 e sem conceito de moldura.
     public static readonly BoardSpec Board = new()
     {
-        BoardSize = 25,
-        Columns = 5,
-        MinNumbersPerGame = 15,
+        BoardSize = 60,
+        Columns = 6,
+        MinNumbersPerGame = 6,
         MaxNumbersPerGame = 20,
-        PrimeNumbers = new HashSet<int> { 2, 3, 5, 7, 11, 13, 17, 19, 23 },
-        IsCenterCell = static (row, column) => row is >= 1 and <= 3 && column is >= 1 and <= 3
+        PrimeNumbers = new HashSet<int> { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59 },
+        IsCenterCell = null
     };
 
-    // Gera jogos unicos da Lotofacil por amostragem aleatoria aplicando os filtros estatisticos.
-    public static LotofacilGameGenerationResult Generate(LotofacilGameGenerationRequest request, Random? random = null)
+    // Gera jogos unicos da Mega-Sena por amostragem aleatoria aplicando os filtros estatisticos.
+    public static MegaSenaGameGenerationResult Generate(MegaSenaGameGenerationRequest request, Random? random = null)
     {
         var coreRequest = new CoreGameRequest
         {
@@ -32,8 +32,6 @@ public static class LotofacilGameGenerator
             MaximumRepeated = request.MaximumRepeated,
             MinimumPrimes = request.MinimumPrimes,
             MaximumPrimes = request.MaximumPrimes,
-            MinimumBorder = request.MinimumBorder,
-            MaximumBorder = request.MaximumBorder,
             MinimumPerRowColumn = request.MinimumPerRowColumn,
             MaximumPerRowColumn = request.MaximumPerRowColumn,
             MaximumSequence = request.MaximumSequence,
@@ -43,29 +41,28 @@ public static class LotofacilGameGenerator
         var result = GameGeneratorCore.Generate(Board, coreRequest, random);
 
         var games = result.Games
-            .Select(game => new GeneratedLotofacilGame(
+            .Select(game => new GeneratedMegaSenaGame(
                 Numbers: game.Numbers.Select(number => number.ToString("00")).ToArray(),
                 EvenCount: game.EvenCount,
                 OddCount: game.OddCount,
                 NumbersSum: game.NumbersSum,
                 RepeatedFromPreviousCount: game.RepeatedFromPreviousCount,
                 PrimeCount: game.PrimeCount,
-                BorderCount: game.BorderCount,
                 LongestSequence: game.LongestSequence))
             .ToArray();
 
-        return new LotofacilGameGenerationResult(games, result.AttemptCount);
+        return new MegaSenaGameGenerationResult(games, result.AttemptCount);
     }
 
     // Monta a chave canonica de um jogo no formato usado para comparar com sorteios da base.
     public static string FormatGameKey(IReadOnlyCollection<int> numbers) => GameGeneratorCore.FormatGameKey(numbers);
 }
 
-public sealed record LotofacilGameGenerationRequest
+public sealed record MegaSenaGameGenerationRequest
 {
     public required int GameCount { get; init; }
 
-    public int NumbersPerGame { get; init; } = 15;
+    public int NumbersPerGame { get; init; } = 6;
 
     public IReadOnlyCollection<string> RequiredNumbers { get; init; } = [];
 
@@ -91,10 +88,6 @@ public sealed record LotofacilGameGenerationRequest
 
     public int? MaximumPrimes { get; init; }
 
-    public int? MinimumBorder { get; init; }
-
-    public int? MaximumBorder { get; init; }
-
     public int? MinimumPerRowColumn { get; init; }
 
     public int? MaximumPerRowColumn { get; init; }
@@ -104,18 +97,15 @@ public sealed record LotofacilGameGenerationRequest
     public IReadOnlySet<string>? ForbiddenGameKeys { get; init; }
 }
 
-public sealed record SumRangeFilter(int MinimumSum, int MaximumSum);
-
-public sealed record LotofacilGameGenerationResult(
-    IReadOnlyList<GeneratedLotofacilGame> Games,
+public sealed record MegaSenaGameGenerationResult(
+    IReadOnlyList<GeneratedMegaSenaGame> Games,
     int AttemptCount);
 
-public sealed record GeneratedLotofacilGame(
+public sealed record GeneratedMegaSenaGame(
     IReadOnlyList<string> Numbers,
     int EvenCount,
     int OddCount,
     int NumbersSum,
     int RepeatedFromPreviousCount,
     int PrimeCount,
-    int BorderCount,
     int LongestSequence);

@@ -618,6 +618,11 @@
   grid-template-columns: repeat(9, 34px);
 }
 
+/* Volante da Mega-Sena: 60 dezenas dispostas em 10 colunas. */
+.gen-board--mega {
+  grid-template-columns: repeat(10, 34px);
+}
+
 .gen-cell {
   background: #ffffff;
   border: 1px solid #bcccdc;
@@ -1179,6 +1184,11 @@
     gap: 5px;
     grid-template-columns: repeat(9, minmax(0, 1fr));
     width: 100%;
+  }
+
+  /* O volante da Mega-Sena mantem 10 colunas fluidas no mobile. */
+  .gen-board--mega {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
   }
 
   .gen-cell {

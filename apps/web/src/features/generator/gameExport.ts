@@ -1,6 +1,8 @@
 // Exportadores dos jogos gerados: CSV (mesmo contrato do backend) e script jogos.js
 // que preenche o volante automaticamente no site da Caixa.
-import { GeneratedGame } from "../../lib/apiClient";
+
+// Contrato minimo comum a qualquer modalidade para exportacao (Lotofacil, Mega-Sena, ...).
+type ExportableGame = { dezenas: string[]; somaDezenas: number };
 
 // Corpo fixo do script de automacao do volante (mesmo comportamento do jogos.js original).
 const VOLANTE_SCRIPT_BODY = `function selecionarNumero(numero) {
@@ -63,7 +65,7 @@ iniciarPreenchimentoDosJogos();
 `;
 
 // Monta o CSV dos jogos no mesmo formato do exportador de geracoes do backend.
-export function buildGamesCsv(games: GeneratedGame[]): string {
+export function buildGamesCsv(games: ExportableGame[]): string {
   const lines = ["numero_jogo,dezenas,soma_dezenas"];
   games.forEach((game, index) => {
     lines.push(`${index + 1},"${game.dezenas.join(" ")}",${game.somaDezenas}`);
@@ -73,7 +75,7 @@ export function buildGamesCsv(games: GeneratedGame[]): string {
 }
 
 // Monta o jogos.js com o array dos jogos gerados seguido do script de automacao do volante.
-export function buildGamesScript(games: GeneratedGame[]): string {
+export function buildGamesScript(games: ExportableGame[]): string {
   const gamesArray = games
     .map((game) => `    [${game.dezenas.map((dezena) => `"${dezena}"`).join(", ")}]`)
     .join(",\n");

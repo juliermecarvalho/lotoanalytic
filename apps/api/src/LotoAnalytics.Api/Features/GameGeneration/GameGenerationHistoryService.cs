@@ -9,8 +9,10 @@ public interface IGameGenerationHistoryService
 {
     Task SaveAsync(
         Guid userId,
-        GenerateLotofacilGamesRequest request,
-        LotofacilGameGenerationResult result,
+        string lotteryModeCode,
+        int numbersPerGame,
+        object filters,
+        IReadOnlyList<GeneratedGameSummary> games,
         CancellationToken cancellationToken);
 
     Task<IReadOnlyList<GameGenerationHistoryItem>> ListByUserAsync(Guid userId, CancellationToken cancellationToken);
@@ -20,23 +22,25 @@ public interface IGameGenerationHistoryService
 
 public sealed class GameGenerationHistoryService(LotoAnalyticsDbContext dbContext) : IGameGenerationHistoryService
 {
-    // Salva a geracao e os jogos gerados no historico do usuario.
+    // Salva a geracao e os jogos gerados no historico do usuario para a modalidade informada.
     public async Task SaveAsync(
         Guid userId,
-        GenerateLotofacilGamesRequest request,
-        LotofacilGameGenerationResult result,
+        string lotteryModeCode,
+        int numbersPerGame,
+        object filters,
+        IReadOnlyList<GeneratedGameSummary> games,
         CancellationToken cancellationToken)
     {
         var now = DateTimeOffset.UtcNow;
         var generation = new DbGameGeneration
         {
             UserId = userId,
-            LotteryModeCode = "lotofacil",
-            GameCount = result.Games.Count,
-            NumbersPerGame = request.NumbersPerGame,
-            FiltersJson = JsonSerializer.Serialize(request),
+            LotteryModeCode = lotteryModeCode,
+            GameCount = games.Count,
+            NumbersPerGame = numbersPerGame,
+            FiltersJson = JsonSerializer.Serialize(filters),
             CreatedAt = now,
-            Games = result.Games
+            Games = games
                 .Select((game, index) => new GeneratedGame
                 {
                     GameNumber = index + 1,
@@ -109,4 +113,11 @@ public sealed record GameGenerationHistoryItem(
 public sealed record GameGenerationHistoryGameItem(
     int GameNumber,
     IReadOnlyList<string> Numbers,
+    int NumbersSum);
+
+// Resumo neutro de um jogo gerado, usado para persistir o historico de qualquer modalidade.
+public sealed record GeneratedGameSummary(
+    IReadOnlyList<string> Numbers,
+    int EvenCount,
+    int OddCount,
     int NumbersSum);

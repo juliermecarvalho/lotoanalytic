@@ -1,3 +1,4 @@
+using LotoAnalytics.Api.Features.GameGeneration;
 using LotoAnalytics.Api.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,11 +11,18 @@ public interface IFilterStatisticsRefreshService
 
 public sealed class FilterStatisticsRefreshService(LotoAnalyticsDbContext dbContext) : IFilterStatisticsRefreshService
 {
+    // Cartela e opcoes de agregacao por modalidade suportada; grade so faz sentido em volantes densos.
+    private static readonly IReadOnlyDictionary<string, (BoardSpec Board, bool IncludeGrid)> SupportedModes =
+        new Dictionary<string, (BoardSpec, bool)>
+        {
+            ["lotofacil"] = (LotofacilGameGenerator.Board, true),
+            ["mega_sena"] = (MegaSenaGameGenerator.Board, false)
+        };
+
     // Recalcula e substitui as estatisticas de filtro da modalidade a partir dos concursos salvos.
     public async Task RefreshAsync(string modeCode, CancellationToken cancellationToken)
     {
-        // As metricas sao calibradas para o volante 5x5 da Lotofacil.
-        if (modeCode != "lotofacil")
+        if (!SupportedModes.TryGetValue(modeCode, out var configuration))
         {
             return;
         }
@@ -30,7 +38,7 @@ public sealed class FilterStatisticsRefreshService(LotoAnalyticsDbContext dbCont
                 .ToArray())
             .ToArrayAsync(cancellationToken);
 
-        var buckets = FilterStatisticsAggregator.Aggregate(draws);
+        var buckets = FilterStatisticsAggregator.Aggregate(draws, configuration.Board, configuration.IncludeGrid);
         var now = DateTimeOffset.UtcNow;
 
         await dbContext.FilterStatistics

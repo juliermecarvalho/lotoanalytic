@@ -1,9 +1,9 @@
+using LotoAnalytics.Api.Features.GameGeneration;
+
 namespace LotoAnalytics.Api.Features.FilterStatistics;
 
 public static class FilterStatisticsAggregator
 {
-    private static readonly HashSet<int> PrimeNumbers = [2, 3, 5, 7, 11, 13, 17, 19, 23];
-
     public const string ParityCategory = "paridade";
     public const string RepetitionCategory = "repeticao";
     public const string PrimesCategory = "primos";
@@ -12,8 +12,18 @@ public static class FilterStatisticsAggregator
     public const string GridCategory = "grade";
     public const string SequenceCategory = "sequencia";
 
-    // Agrega as distribuicoes das oito estatisticas de filtro a partir dos sorteios ordenados.
+    // Agrega as distribuicoes das estatisticas de filtro do volante 5x5 da Lotofacil (compatibilidade).
     public static IReadOnlyList<FilterStatisticBucket> Aggregate(IReadOnlyList<IReadOnlyList<int>> orderedDraws)
+    {
+        return Aggregate(orderedDraws, LotofacilGameGenerator.Board, includeGrid: true);
+    }
+
+    // Agrega as distribuicoes das estatisticas de filtro para a cartela informada.
+    // A moldura so e computada quando a cartela define o miolo; a grade linha/coluna e opcional.
+    public static IReadOnlyList<FilterStatisticBucket> Aggregate(
+        IReadOnlyList<IReadOnlyList<int>> orderedDraws,
+        BoardSpec spec,
+        bool includeGrid)
     {
         var counters = new Dictionary<(string Category, int Value), int>();
         HashSet<int>? previousDraw = null;
@@ -21,14 +31,22 @@ public static class FilterStatisticsAggregator
         foreach (var draw in orderedDraws)
         {
             var numbers = draw.Order().ToArray();
-            var metrics = ComputeMetrics(numbers);
+            var metrics = ComputeMetrics(numbers, spec, includeGrid);
 
             Increment(counters, ParityCategory, metrics.EvenCount);
             Increment(counters, PrimesCategory, metrics.PrimeCount);
-            Increment(counters, BorderCategory, metrics.BorderCount);
             Increment(counters, SumCategory, metrics.Sum);
-            Increment(counters, GridCategory, metrics.GridClass);
             Increment(counters, SequenceCategory, metrics.MaxSequence);
+
+            if (metrics.BorderCount is not null)
+            {
+                Increment(counters, BorderCategory, metrics.BorderCount.Value);
+            }
+
+            if (metrics.GridClass is not null)
+            {
+                Increment(counters, GridCategory, metrics.GridClass.Value);
+            }
 
             if (previousDraw is not null)
             {
@@ -51,9 +69,10 @@ public static class FilterStatisticsAggregator
         counters[(category, value)] = counters.GetValueOrDefault((category, value)) + 1;
     }
 
-    // Calcula as metricas de um sorteio com dezenas ordenadas.
-    private static DrawMetrics ComputeMetrics(int[] numbers)
+    // Calcula as metricas de um sorteio com dezenas ordenadas para a cartela informada.
+    private static DrawMetrics ComputeMetrics(int[] numbers, BoardSpec spec, bool includeGrid)
     {
+        var rows = spec.BoardSize / spec.Columns;
         var evenCount = 0;
         var sum = 0;
         var primeCount = 0;
@@ -61,8 +80,8 @@ public static class FilterStatisticsAggregator
         var maxSequence = 0;
         var currentSequence = 0;
         var previousValue = int.MinValue;
-        var rowCounts = new int[5];
-        var columnCounts = new int[5];
+        var rowCounts = new int[rows];
+        var columnCounts = new int[spec.Columns];
 
         foreach (var number in numbers)
         {
@@ -73,16 +92,16 @@ public static class FilterStatisticsAggregator
 
             sum += number;
 
-            if (PrimeNumbers.Contains(number))
+            if (spec.PrimeNumbers.Contains(number))
             {
                 primeCount++;
             }
 
-            var row = (number - 1) / 5;
-            var column = (number - 1) % 5;
+            var row = (number - 1) / spec.Columns;
+            var column = (number - 1) % spec.Columns;
             rowCounts[row]++;
             columnCounts[column]++;
-            if (row is >= 1 and <= 3 && column is >= 1 and <= 3)
+            if (spec.IsCenterCell is not null && spec.IsCenterCell(row, column))
             {
                 centerCount++;
             }
@@ -92,16 +111,20 @@ public static class FilterStatisticsAggregator
             previousValue = number;
         }
 
-        var allCounts = rowCounts.Concat(columnCounts).ToArray();
-        var min = allCounts.Min();
-        var max = allCounts.Max();
-        var gridClass = min == 0 ? 3 : max >= 5 ? 2 : min == 1 ? 1 : 0;
+        int? gridClass = null;
+        if (includeGrid)
+        {
+            var allCounts = rowCounts.Concat(columnCounts).ToArray();
+            var min = allCounts.Min();
+            var max = allCounts.Max();
+            gridClass = min == 0 ? 3 : max >= 5 ? 2 : min == 1 ? 1 : 0;
+        }
 
         return new DrawMetrics(
             EvenCount: evenCount,
             Sum: sum,
             PrimeCount: primeCount,
-            BorderCount: numbers.Length - centerCount,
+            BorderCount: spec.IsCenterCell is null ? null : numbers.Length - centerCount,
             MaxSequence: maxSequence,
             GridClass: gridClass);
     }
@@ -110,9 +133,9 @@ public static class FilterStatisticsAggregator
         int EvenCount,
         int Sum,
         int PrimeCount,
-        int BorderCount,
+        int? BorderCount,
         int MaxSequence,
-        int GridClass);
+        int? GridClass);
 }
 
 public sealed record FilterStatisticBucket(string Category, int Value, int Count);

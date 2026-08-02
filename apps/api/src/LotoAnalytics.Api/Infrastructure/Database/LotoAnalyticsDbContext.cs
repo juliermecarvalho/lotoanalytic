@@ -116,7 +116,7 @@ public sealed class LotoAnalyticsDbContext(DbContextOptions<LotoAnalyticsDbConte
 
             entity.HasData(
                 new LotteryMode { Id = LotofacilModeId, Code = "lotofacil", Name = "Lotofacil", CaixaGameType = "LOTOFACIL", CaixaGameNumber = 25, MainNumbersCount = 15, SimpleBetPrice = 3.50m, Active = true, CreatedAt = createdAt, UpdatedAt = createdAt },
-                new LotteryMode { Id = MegaSenaModeId, Code = "mega_sena", Name = "Mega-Sena", CaixaGameType = "MEGA_SENA", CaixaGameNumber = 2, MainNumbersCount = 6, Active = true, CreatedAt = createdAt, UpdatedAt = createdAt },
+                new LotteryMode { Id = MegaSenaModeId, Code = "mega_sena", Name = "Mega-Sena", CaixaGameType = "MEGA_SENA", CaixaGameNumber = 2, MainNumbersCount = 6, SimpleBetPrice = 6.00m, Active = true, CreatedAt = createdAt, UpdatedAt = createdAt },
                 new LotteryMode { Id = QuinaModeId, Code = "quina", Name = "Quina", CaixaGameType = "QUINA", CaixaGameNumber = 5, MainNumbersCount = 5, Active = true, CreatedAt = createdAt, UpdatedAt = createdAt },
                 new LotteryMode { Id = MaisMilionariaModeId, Code = "maismilionaria", Name = "+Milionaria", CaixaGameType = "MAIS_MILIONARIA", CaixaGameNumber = 33, MainNumbersCount = 6, HasTrevos = true, Active = true, CreatedAt = createdAt, UpdatedAt = createdAt },
                 new LotteryMode { Id = LotomaniaModeId, Code = "lotomania", Name = "Lotomania", CaixaGameType = "LOTOMANIA", CaixaGameNumber = 7, MainNumbersCount = 20, Active = true, CreatedAt = createdAt, UpdatedAt = createdAt },

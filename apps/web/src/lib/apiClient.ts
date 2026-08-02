@@ -65,6 +65,22 @@ export type GenerateGamesResponse = {
   combinacoesTestadas: number;
 };
 
+// Jogo gerado da Mega-Sena: sem moldura (a cartela 10x6 nao tem esse conceito).
+export type GeneratedMegaSenaGame = {
+  dezenas: string[];
+  quantidadePares: number;
+  quantidadeImpares: number;
+  somaDezenas: number;
+  quantidadeRepetidas: number;
+  quantidadePrimos: number;
+  maiorSequencia: number;
+};
+
+export type GenerateMegaSenaGamesResponse = {
+  jogos: GeneratedMegaSenaGame[];
+  combinacoesTestadas: number;
+};
+
 export type CheckGamesRequest = {
   dezenasSorteadas: string[];
   jogos: string[][];
