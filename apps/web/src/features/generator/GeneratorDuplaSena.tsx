@@ -116,7 +116,7 @@ export function GeneratorDuplaSena() {
     let active = true;
     const client = new ApiClient({ baseUrl: state.apiBaseUrl });
     client
-      .getJson<LatestContestResponse>("/concursos/dupla-sena/ultimo")
+      .getJson<LatestContestResponse>("/concursos/dupla_sena/ultimo")
       .then((contest) => {
         if (active) {
           setLatestContest(contest);
@@ -124,7 +124,7 @@ export function GeneratorDuplaSena() {
       })
       .catch(() => undefined);
     client
-      .getJson<FilterStatisticsResponse>("/estatisticas/dupla-sena/filtros")
+      .getJson<FilterStatisticsResponse>("/estatisticas/dupla_sena/filtros")
       .then((statistics) => {
         if (active) {
           setFilterStatistics(statistics);
