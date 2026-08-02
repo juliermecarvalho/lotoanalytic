@@ -97,8 +97,8 @@ public static class FilterStatisticsAggregator
                 primeCount++;
             }
 
-            var row = (number - 1) / spec.Columns;
-            var column = (number - 1) % spec.Columns;
+            var row = (number - spec.FirstNumber) / spec.Columns;
+            var column = (number - spec.FirstNumber) % spec.Columns;
             rowCounts[row]++;
             columnCounts[column]++;
             if (spec.IsCenterCell is not null && spec.IsCenterCell(row, column))

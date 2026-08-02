@@ -30,7 +30,7 @@ public static class GameGeneratorCore
 
         var required = requiredNumbers.Order().ToArray();
         var pool = Enumerable
-            .Range(1, spec.BoardSize)
+            .Range(spec.FirstNumber, spec.BoardSize)
             .Where(number => !requiredNumbers.Contains(number) && !excludedNumbers.Contains(number))
             .ToArray();
 
@@ -128,8 +128,8 @@ public static class GameGeneratorCore
                 primeCount++;
             }
 
-            var row = (number - 1) / spec.Columns;
-            var column = (number - 1) % spec.Columns;
+            var row = (number - spec.FirstNumber) / spec.Columns;
+            var column = (number - spec.FirstNumber) % spec.Columns;
             rowCounts[row]++;
             columnCounts[column]++;
             if (spec.IsCenterCell is not null && spec.IsCenterCell(row, column))
@@ -275,9 +275,9 @@ public static class GameGeneratorCore
         return numbers
             .Select(number =>
             {
-                if (!int.TryParse(number.Trim(), out var parsed) || parsed < 1 || parsed > spec.BoardSize)
+                if (!int.TryParse(number.Trim(), out var parsed) || parsed < spec.FirstNumber || parsed > spec.LastNumber)
                 {
-                    throw new ArgumentException($"A dezena deve estar entre 01 e {spec.BoardSize:00}.", nameof(numbers));
+                    throw new ArgumentException($"A dezena deve estar entre {spec.FirstNumber:00} e {spec.LastNumber:00}.", nameof(numbers));
                 }
 
                 return parsed;
@@ -303,7 +303,14 @@ public static class GameGeneratorCore
 // Descreve a cartela de uma modalidade para o nucleo de geracao.
 public sealed record BoardSpec
 {
+    // Quantidade de casas da cartela (25 na Lotofacil, 100 na Lotomania).
     public required int BoardSize { get; init; }
+
+    // Primeira dezena da cartela: 1 na maioria das modalidades e 0 na Lotomania (00-99).
+    public int FirstNumber { get; init; } = 1;
+
+    // Ultima dezena valida da cartela, deduzida a partir da primeira dezena e do tamanho.
+    public int LastNumber => FirstNumber + BoardSize - 1;
 
     // Numero de colunas do volante; as linhas sao deduzidas por BoardSize / Columns.
     public required int Columns { get; init; }

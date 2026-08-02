@@ -114,6 +114,63 @@ public sealed class LotofacilDashboardAggregatorTests
         snapshot.Categories.ShouldNotContainKey("grade");
     }
 
+    // Configuracao do painel da Lotomania (cartela 00-99, sem moldura/grade).
+    private static readonly DashboardBoardConfig LotomaniaConfig = new()
+    {
+        Board = LotomaniaGameGenerator.Board,
+        PreferredSumLowerBound = 880,
+        PreferredSumUpperBound = 1100,
+        IncludeGrid = false
+    };
+
+    private static readonly DashboardDraw[] LotomaniaDraws =
+    [
+        new(1, new DateOnly(2026, 7, 20), [0, 1, 2, 9, 10, 99]),
+        new(2, new DateOnly(2026, 7, 21), [0, 3, 5, 50, 51, 98])
+    ];
+
+    [Fact]
+    public void AggregateForLotomaniaUsesTheZeroBasedBoardOf100()
+    {
+        var snapshot = LotofacilDashboardAggregator.Aggregate(LotomaniaDraws, LotomaniaConfig);
+
+        snapshot.TotalContests.ShouldBe(2);
+        // Cartela 00-99: 100 dezenas na lista de frequencias, comecando pela 00.
+        snapshot.Frequencies.Count.ShouldBe(100);
+        snapshot.Frequencies.ShouldContain(item => item.Number == 0);
+        snapshot.Frequencies.ShouldContain(item => item.Number == 99);
+
+        // Dezena 00 saiu nos dois concursos: atraso zero e ultimo concurso 2.
+        var number0 = snapshot.Frequencies.Single(item => item.Number == 0);
+        number0.Count.ShouldBe(2);
+        number0.Delay.ShouldBe(0);
+        number0.LastContest.ShouldBe(2);
+
+        // Dezena 99 saiu apenas no concurso 1, ficando de fora do concurso 2 (atraso 1).
+        var number99 = snapshot.Frequencies.Single(item => item.Number == 99);
+        number99.Count.ShouldBe(1);
+        number99.Delay.ShouldBe(1);
+        number99.LastContest.ShouldBe(1);
+
+        // Soma media = (121 + 207) / 2.
+        snapshot.Summary.AverageSum.ShouldBe(164.0);
+
+        // Ultimo concurso: 3 pares (00 e par), soma 207, 2 primos (03 e 05) e sem moldura.
+        snapshot.LatestContest.ShouldNotBeNull();
+        snapshot.LatestContest.ContestNumber.ShouldBe(2);
+        snapshot.LatestContest.EvenCount.ShouldBe(3);
+        snapshot.LatestContest.Sum.ShouldBe(207);
+        snapshot.LatestContest.PrimeCount.ShouldBe(2);
+        snapshot.LatestContest.BorderCount.ShouldBe(0);
+        snapshot.LatestContest.RepeatedFromPrevious.ShouldBe(1);
+        snapshot.LatestContest.Numbers.Count.ShouldBe(6);
+        snapshot.LatestContest.Numbers[0].ShouldBe("00");
+
+        snapshot.Categories.ShouldContainKey("paridade");
+        snapshot.Categories.ShouldNotContainKey("moldura");
+        snapshot.Categories.ShouldNotContainKey("grade");
+    }
+
     [Fact]
     public void AggregateReturnsEmptySnapshotForNoDraws()
     {

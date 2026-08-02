@@ -97,6 +97,22 @@ export type GenerateQuinaGamesResponse = {
   combinacoesTestadas: number;
 };
 
+// Aposta gerada da Lotomania: 50 dezenas de 00 a 99, sem moldura (a cartela 10x10 nao tem esse conceito).
+export type GeneratedLotomaniaGame = {
+  dezenas: string[];
+  quantidadePares: number;
+  quantidadeImpares: number;
+  somaDezenas: number;
+  quantidadeRepetidas: number;
+  quantidadePrimos: number;
+  maiorSequencia: number;
+};
+
+export type GenerateLotomaniaGamesResponse = {
+  jogos: GeneratedLotomaniaGame[];
+  combinacoesTestadas: number;
+};
+
 export type CheckGamesRequest = {
   dezenasSorteadas: string[];
   jogos: string[][];

@@ -28,6 +28,14 @@ public sealed class LotofacilDashboardController(LotoAnalyticsDbContext dbContex
                 PreferredSumLowerBound = 165,
                 PreferredSumUpperBound = 240,
                 IncludeGrid = false
+            },
+            ["lotomania"] = new()
+            {
+                // Sorteio da Lotomania traz 20 dezenas de 00 a 99; a soma media fica em torno de 990.
+                Board = LotomaniaGameGenerator.Board,
+                PreferredSumLowerBound = 880,
+                PreferredSumUpperBound = 1100,
+                IncludeGrid = false
             }
         };
 

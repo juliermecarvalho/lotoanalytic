@@ -628,6 +628,11 @@
   grid-template-columns: repeat(10, 34px);
 }
 
+/* Volante da Lotomania: 100 dezenas (00-99) dispostas em 10 colunas. */
+.gen-board--lotomania {
+  grid-template-columns: repeat(10, 34px);
+}
+
 .gen-cell {
   background: #ffffff;
   border: 1px solid #bcccdc;
@@ -1198,6 +1203,10 @@
 
   /* O volante da Quina mantem 10 colunas fluidas no mobile. */
   .gen-board--quina {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+  }
+
+  .gen-board--lotomania {
     grid-template-columns: repeat(10, minmax(0, 1fr));
   }
 

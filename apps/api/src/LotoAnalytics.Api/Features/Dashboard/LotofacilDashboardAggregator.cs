@@ -24,6 +24,8 @@ public static class LotofacilDashboardAggregator
     public static DashboardSnapshot Aggregate(IReadOnlyList<DashboardDraw> orderedDraws, DashboardBoardConfig config)
     {
         var boardSize = config.Board.BoardSize;
+        var firstNumber = config.Board.FirstNumber;
+        var lastNumber = config.Board.LastNumber;
         if (orderedDraws.Count == 0)
         {
             return new DashboardSnapshot(
@@ -57,7 +59,7 @@ public static class LotofacilDashboardAggregator
             var sum = 0;
             foreach (var number in numbers)
             {
-                if (number >= 1 && number <= boardSize)
+                if (number >= firstNumber && number <= lastNumber)
                 {
                     frequency[number]++;
                     lastSeenContest[number] = draw.ContestNumber;
@@ -92,7 +94,7 @@ public static class LotofacilDashboardAggregator
         var total = orderedDraws.Count;
 
         var frequencies = new List<DashboardNumberFrequency>(boardSize);
-        for (var number = 1; number <= boardSize; number++)
+        for (var number = firstNumber; number <= lastNumber; number++)
         {
             var count = frequency[number];
             var percentage = Percentage(count, total);
@@ -155,8 +157,8 @@ public static class LotofacilDashboardAggregator
     // Indica se a dezena esta na moldura do volante (fora do miolo definido pela cartela).
     private static bool IsBorder(int number, BoardSpec board)
     {
-        var row = (number - 1) / board.Columns;
-        var column = (number - 1) % board.Columns;
+        var row = (number - board.FirstNumber) / board.Columns;
+        var column = (number - board.FirstNumber) % board.Columns;
         return board.IsCenterCell is null || !board.IsCenterCell(row, column);
     }
 

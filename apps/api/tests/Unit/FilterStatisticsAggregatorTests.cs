@@ -87,6 +87,40 @@ public sealed class FilterStatisticsAggregatorTests
     }
 
     [Fact]
+    public void AggregateForLotomaniaHandlesTheZeroBasedBoardWithoutCrashing()
+    {
+        // Sorteios com a dezena 00 e a 99: antes do suporte a cartela 0-based, a grade estourava o indice.
+        int[][] lotomaniaDraws =
+        [
+            [0, 1, 2, 9, 10, 99],
+            [0, 3, 5, 50, 51, 98]
+        ];
+
+        var buckets = FilterStatisticsAggregator.Aggregate(lotomaniaDraws, LotomaniaGameGenerator.Board, includeGrid: false);
+
+        // Paridade: ambos os sorteios tem 3 pares (00 conta como par).
+        CountOf(buckets, "paridade", 3).ShouldBe(2);
+
+        // Primos ate 99: sorteio 1 tem {2} = 1 primo; sorteio 2 tem {3,5} = 2 primos.
+        CountOf(buckets, "primos", 1).ShouldBe(1);
+        CountOf(buckets, "primos", 2).ShouldBe(1);
+
+        CountOf(buckets, "soma", 121).ShouldBe(1);
+        CountOf(buckets, "soma", 207).ShouldBe(1);
+
+        // Sequencia: sorteio 1 tem a corrida 0-1-2 (3); sorteio 2 tem 50-51 (2).
+        CountOf(buckets, "sequencia", 3).ShouldBe(1);
+        CountOf(buckets, "sequencia", 2).ShouldBe(1);
+
+        // Repeticao: o sorteio 2 repete apenas a dezena 00 do sorteio 1.
+        CountOf(buckets, "repeticao", 1).ShouldBe(1);
+
+        // A Lotomania nao tem moldura nem estatistica de grade.
+        SumOf(buckets, "moldura").ShouldBe(0);
+        SumOf(buckets, "grade").ShouldBe(0);
+    }
+
+    [Fact]
     public void AggregateReturnsNoBucketsForAnEmptyBase()
     {
         FilterStatisticsAggregator.Aggregate([]).ShouldBeEmpty();
