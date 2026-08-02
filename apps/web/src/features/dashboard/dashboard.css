@@ -225,6 +225,22 @@
   text-align: center;
 }
 
+/* Painel da Mega-Sena: 60 dezenas dispostas em duas linhas de 30 barras. */
+.dash-bars.dash-bars--mega {
+  grid-template-columns: repeat(30, minmax(0, 1fr));
+  grid-auto-rows: 150px;
+  height: auto;
+  gap: 12px 3px;
+}
+
+.dash-bars--mega .dash-bar-value {
+  font-size: 8px;
+}
+
+.dash-bars--mega .dash-bar-label {
+  font-size: 8px;
+}
+
 .dash-card-foot {
   border-top: 1px solid #e6edf3;
   display: grid;

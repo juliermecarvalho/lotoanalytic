@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using LotoAnalytics.Api.Features.GameGeneration;
 using LotoAnalytics.Api.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,20 @@ namespace LotoAnalytics.Api.Features.Dashboard;
 [Route("estatisticas")]
 public sealed class LotofacilDashboardController(LotoAnalyticsDbContext dbContext) : ControllerBase
 {
+    // Configuracao de painel por modalidade suportada; demais modalidades usam o volante da Lotofacil.
+    private static readonly IReadOnlyDictionary<string, DashboardBoardConfig> BoardConfigs =
+        new Dictionary<string, DashboardBoardConfig>
+        {
+            ["lotofacil"] = LotofacilDashboardAggregator.LotofacilConfig,
+            ["mega_sena"] = new()
+            {
+                Board = MegaSenaGameGenerator.Board,
+                PreferredSumLowerBound = 150,
+                PreferredSumUpperBound = 210,
+                IncludeGrid = false
+            }
+        };
+
     // Monta o painel estatistico consolidado da modalidade a partir dos concursos salvos.
     [HttpGet("{codigoModalidade}/painel")]
     public async Task<ActionResult<DashboardResponse>> GetDashboard(
@@ -35,7 +50,8 @@ public sealed class LotofacilDashboardController(LotoAnalyticsDbContext dbContex
             .Select(draw => new DashboardDraw(draw.Number, draw.DrawDate, draw.Numbers))
             .ToArray();
 
-        var snapshot = LotofacilDashboardAggregator.Aggregate(orderedDraws);
+        var config = BoardConfigs.GetValueOrDefault(codigoModalidade, LotofacilDashboardAggregator.LotofacilConfig);
+        var snapshot = LotofacilDashboardAggregator.Aggregate(orderedDraws, config);
 
         return Ok(MapToResponse(codigoModalidade, snapshot));
     }

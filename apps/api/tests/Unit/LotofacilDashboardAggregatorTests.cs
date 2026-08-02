@@ -1,4 +1,5 @@
 using LotoAnalytics.Api.Features.Dashboard;
+using LotoAnalytics.Api.Features.GameGeneration;
 using Shouldly;
 using Xunit;
 
@@ -6,6 +7,20 @@ namespace LotoAnalytics.Api.UnitTests;
 
 public sealed class LotofacilDashboardAggregatorTests
 {
+    // Configuracao do painel da Mega-Sena (cartela 60, sem moldura/grade).
+    private static readonly DashboardBoardConfig MegaSenaConfig = new()
+    {
+        Board = MegaSenaGameGenerator.Board,
+        PreferredSumLowerBound = 150,
+        PreferredSumUpperBound = 210,
+        IncludeGrid = false
+    };
+
+    private static readonly DashboardDraw[] MegaDraws =
+    [
+        new(1, new DateOnly(2026, 7, 20), [1, 2, 3, 4, 5, 6]),
+        new(2, new DateOnly(2026, 7, 21), [10, 20, 30, 40, 50, 60])
+    ];
     // Mesmo conjunto de sorteios dos demais testes, com metricas calculadas manualmente.
     private static readonly DashboardDraw[] Draws =
     [
@@ -68,6 +83,35 @@ public sealed class LotofacilDashboardAggregatorTests
         snapshot.Categories.ShouldContainKey("paridade");
         snapshot.Categories.ShouldContainKey("soma");
         snapshot.Categories["moldura"].Single(item => item.Value == 9).Count.ShouldBe(2);
+    }
+
+    [Fact]
+    public void AggregateForMegaSenaUsesTheBoardOf60WithoutBorderOrGrid()
+    {
+        var snapshot = LotofacilDashboardAggregator.Aggregate(MegaDraws, MegaSenaConfig);
+
+        snapshot.TotalContests.ShouldBe(2);
+        snapshot.Frequencies.Count.ShouldBe(60);
+
+        // Soma media = (21 + 210) / 2; apenas o concurso 2 (210) esta na faixa preferencial 150-210.
+        snapshot.Summary.AverageSum.ShouldBe(115.5);
+        snapshot.Summary.PreferredSumPercentage.ShouldBe(50.0);
+
+        // Ultimo concurso: 6 pares, soma 210, sem primos e sem moldura.
+        snapshot.LatestContest.ShouldNotBeNull();
+        snapshot.LatestContest.ContestNumber.ShouldBe(2);
+        snapshot.LatestContest.EvenCount.ShouldBe(6);
+        snapshot.LatestContest.Sum.ShouldBe(210);
+        snapshot.LatestContest.PrimeCount.ShouldBe(0);
+        snapshot.LatestContest.BorderCount.ShouldBe(0);
+        snapshot.LatestContest.Numbers.Count.ShouldBe(6);
+
+        // A Mega-Sena nao tem moldura nem grade nas categorias.
+        snapshot.Categories.ShouldContainKey("paridade");
+        snapshot.Categories.ShouldContainKey("primos");
+        snapshot.Categories.ShouldContainKey("sequencia");
+        snapshot.Categories.ShouldNotContainKey("moldura");
+        snapshot.Categories.ShouldNotContainKey("grade");
     }
 
     [Fact]

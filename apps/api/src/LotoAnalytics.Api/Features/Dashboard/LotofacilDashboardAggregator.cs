@@ -1,18 +1,29 @@
 using LotoAnalytics.Api.Features.FilterStatistics;
+using LotoAnalytics.Api.Features.GameGeneration;
 
 namespace LotoAnalytics.Api.Features.Dashboard;
 
 public static class LotofacilDashboardAggregator
 {
-    private const int BoardSize = 25;
-    private const int PreferredSumLowerBound = 185;
-    private const int PreferredSumUpperBound = 210;
+    // Configuracao do volante 5x5 da Lotofacil, usada por padrao para manter a compatibilidade.
+    public static readonly DashboardBoardConfig LotofacilConfig = new()
+    {
+        Board = LotofacilGameGenerator.Board,
+        PreferredSumLowerBound = 185,
+        PreferredSumUpperBound = 210,
+        IncludeGrid = true
+    };
 
-    private static readonly HashSet<int> PrimeNumbers = [2, 3, 5, 7, 11, 13, 17, 19, 23];
-
-    // Consolida frequencias, atrasos, KPIs e distribuicoes de filtro a partir dos sorteios ordenados.
+    // Consolida frequencias, atrasos, KPIs e distribuicoes de filtro do volante 5x5 da Lotofacil.
     public static DashboardSnapshot Aggregate(IReadOnlyList<DashboardDraw> orderedDraws)
     {
+        return Aggregate(orderedDraws, LotofacilConfig);
+    }
+
+    // Consolida o painel estatistico para a cartela descrita em config.
+    public static DashboardSnapshot Aggregate(IReadOnlyList<DashboardDraw> orderedDraws, DashboardBoardConfig config)
+    {
+        var boardSize = config.Board.BoardSize;
         if (orderedDraws.Count == 0)
         {
             return new DashboardSnapshot(
@@ -23,9 +34,9 @@ public static class LotofacilDashboardAggregator
                 Categories: new Dictionary<string, IReadOnlyList<DashboardCategoryItem>>());
         }
 
-        var frequency = new int[BoardSize + 1];
-        var lastSeenContest = new int[BoardSize + 1];
-        var lastSeenIndex = new int[BoardSize + 1];
+        var frequency = new int[boardSize + 1];
+        var lastSeenContest = new int[boardSize + 1];
+        var lastSeenIndex = new int[boardSize + 1];
         Array.Fill(lastSeenContest, 0);
         Array.Fill(lastSeenIndex, -1);
 
@@ -46,7 +57,7 @@ public static class LotofacilDashboardAggregator
             var sum = 0;
             foreach (var number in numbers)
             {
-                if (number is >= 1 and <= BoardSize)
+                if (number >= 1 && number <= boardSize)
                 {
                     frequency[number]++;
                     lastSeenContest[number] = draw.ContestNumber;
@@ -57,7 +68,7 @@ public static class LotofacilDashboardAggregator
             }
 
             sumTotal += sum;
-            if (sum is >= PreferredSumLowerBound and <= PreferredSumUpperBound)
+            if (sum >= config.PreferredSumLowerBound && sum <= config.PreferredSumUpperBound)
             {
                 preferredSumCount++;
             }
@@ -80,8 +91,8 @@ public static class LotofacilDashboardAggregator
 
         var total = orderedDraws.Count;
 
-        var frequencies = new List<DashboardNumberFrequency>(BoardSize);
-        for (var number = 1; number <= BoardSize; number++)
+        var frequencies = new List<DashboardNumberFrequency>(boardSize);
+        for (var number = 1; number <= boardSize; number++)
         {
             var count = frequency[number];
             var percentage = Percentage(count, total);
@@ -94,7 +105,7 @@ public static class LotofacilDashboardAggregator
         var latest = orderedDraws[^1];
         var latestNumbers = latest.Numbers.Order().ToArray();
         var previousDraw = orderedDraws.Count >= 2 ? orderedDraws[^2].Numbers.Order().ToArray() : null;
-        var latestSummary = BuildLatestContest(latest, latestNumbers, previousDraw);
+        var latestSummary = BuildLatestContest(latest, latestNumbers, previousDraw, config.Board);
 
         var uniquePercentage = Percentage(uniqueCombinations.Count, total);
         var summary = new DashboardSummary(
@@ -104,7 +115,9 @@ public static class LotofacilDashboardAggregator
             PreferredSumPercentage: Percentage(preferredSumCount, total));
 
         var buckets = FilterStatisticsAggregator.Aggregate(
-            orderedDraws.Select(draw => (IReadOnlyList<int>)draw.Numbers).ToArray());
+            orderedDraws.Select(draw => (IReadOnlyList<int>)draw.Numbers).ToArray(),
+            config.Board,
+            config.IncludeGrid);
 
         var categories = buckets
             .GroupBy(bucket => bucket.Category)
@@ -119,11 +132,12 @@ public static class LotofacilDashboardAggregator
     }
 
     // Calcula as metricas do ultimo concurso para alimentar o card lateral do painel.
-    private static DashboardLatestContest BuildLatestContest(DashboardDraw latest, int[] numbers, int[]? previous)
+    private static DashboardLatestContest BuildLatestContest(DashboardDraw latest, int[] numbers, int[]? previous, BoardSpec board)
     {
         var evenCount = numbers.Count(number => number % 2 == 0);
-        var primeCount = numbers.Count(PrimeNumbers.Contains);
-        var borderCount = numbers.Count(IsBorder);
+        var primeCount = numbers.Count(board.PrimeNumbers.Contains);
+        // A moldura so existe em cartelas com miolo definido (Lotofacil); modalidades sem miolo retornam 0.
+        var borderCount = board.IsCenterCell is null ? 0 : numbers.Count(number => IsBorder(number, board));
         var repeated = previous is null ? 0 : numbers.Count(previous.Contains);
 
         return new DashboardLatestContest(
@@ -138,12 +152,12 @@ public static class LotofacilDashboardAggregator
             RepeatedFromPrevious: repeated);
     }
 
-    // Indica se a dezena esta na moldura do volante 5x5 (linha ou coluna nas bordas).
-    private static bool IsBorder(int number)
+    // Indica se a dezena esta na moldura do volante (fora do miolo definido pela cartela).
+    private static bool IsBorder(int number, BoardSpec board)
     {
-        var row = (number - 1) / 5;
-        var column = (number - 1) % 5;
-        return row is 0 or 4 || column is 0 or 4;
+        var row = (number - 1) / board.Columns;
+        var column = (number - 1) % board.Columns;
+        return board.IsCenterCell is null || !board.IsCenterCell(row, column);
     }
 
     // Converte uma contagem em percentual arredondado com uma casa decimal.
@@ -151,6 +165,20 @@ public static class LotofacilDashboardAggregator
     {
         return total == 0 ? 0 : Math.Round(count * 100.0 / total, 1);
     }
+}
+
+// Configuracao de cartela para o painel estatistico de uma modalidade.
+public sealed record DashboardBoardConfig
+{
+    public required BoardSpec Board { get; init; }
+
+    // Faixa de soma considerada "preferencial" no KPI do painel.
+    public required int PreferredSumLowerBound { get; init; }
+
+    public required int PreferredSumUpperBound { get; init; }
+
+    // Inclui a distribuicao de grade (linha/coluna) nas categorias; so faz sentido em volantes densos.
+    public required bool IncludeGrid { get; init; }
 }
 
 public sealed record DashboardDraw(int ContestNumber, DateOnly? DrawDate, IReadOnlyList<int> Numbers);

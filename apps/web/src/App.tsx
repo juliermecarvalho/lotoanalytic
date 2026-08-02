@@ -39,6 +39,7 @@ import { GeneratorLotofacil } from "./features/generator/GeneratorLotofacil";
 import { GeneratorMegaSena } from "./features/generator/GeneratorMegaSena";
 import { PrivacyPolicyPage } from "./features/legal/PrivacyPolicyPage";
 import { DashboardLotofacil } from "./features/dashboard/DashboardLotofacil";
+import { DashboardMegaSena } from "./features/dashboard/DashboardMegaSena";
 import { AdBlockGate } from "./features/adblock/AdBlockGate";
 import "./styles.css";
 
@@ -97,6 +98,11 @@ function createAppRouter() {
     getParentRoute: () => rootRoute,
     path: "/dashboard/lotofacil",
     component: DashboardLotofacil
+  });
+  const dashboardMegaSenaRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/dashboard/mega-sena",
+    component: DashboardMegaSena
   });
   const generatorRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -167,6 +173,7 @@ function createAppRouter() {
   });
   const routeTree = rootRoute.addChildren([
     dashboardLotofacilRoute,
+    dashboardMegaSenaRoute,
     generatorRoute,
     generatorMegaSenaRoute,
     legacyGeneratorRoute,
@@ -237,8 +244,8 @@ function Shell() {
           <Link to="/dashboard/lotofacil" activeProps={{ className: "active" }}>
             <LayoutDashboard size={18} /> Lotofácil
           </Link>
-          <Link to="/gerar-jogos/mega-sena" activeProps={{ className: "active" }}>
-            <Dices size={18} /> Gerar Mega-Sena
+          <Link to="/dashboard/mega-sena" activeProps={{ className: "active" }}>
+            <Dices size={18} /> Mega-Sena
           </Link>
         </nav>
       </aside>

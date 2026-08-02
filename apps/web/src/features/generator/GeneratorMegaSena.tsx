@@ -40,6 +40,51 @@ const pad2 = (value: number) => String(value).padStart(2, "0");
 const formatPercent = (value: number) => `${value.toFixed(1).replace(".", ",")}%`;
 const formatInt = (value: number) => value.toLocaleString("pt-BR");
 const formatCurrency = (value: number) => value.toFixed(2).replace(".", ",");
+const ADSENSE_CLIENT = import.meta.env.VITE_ADSENSE_CLIENT ?? "";
+const ADSENSE_SLOTS = {
+  leaderboard: import.meta.env.VITE_ADSENSE_SLOT_LEADERBOARD ?? "",
+  rectangle: import.meta.env.VITE_ADSENSE_SLOT_RECTANGLE ?? "",
+  halfPage: import.meta.env.VITE_ADSENSE_SLOT_HALF_PAGE ?? "",
+  sidebarExtra: import.meta.env.VITE_ADSENSE_SLOT_SIDEBAR_EXTRA ?? "",
+  responsive: import.meta.env.VITE_ADSENSE_SLOT_RESPONSIVE ?? ""
+};
+
+// Espaco de anuncio AdSense estavel: mantem a caixa mesmo quando o provedor nao carrega.
+function AdSpace({
+  slot,
+  format,
+  className
+}: {
+  slot: string;
+  format: "728x90" | "300x250" | "300x600" | "auto";
+  className: string;
+}) {
+  useEffect(() => {
+    if (!ADSENSE_CLIENT || !slot) {
+      return;
+    }
+    try {
+      const adsWindow = window as Window & { adsbygoogle?: unknown[] };
+      (adsWindow.adsbygoogle = adsWindow.adsbygoogle || []).push({});
+    } catch {
+      // O espaço reservado permanece estável quando o provedor bloqueia o anúncio.
+    }
+  }, [slot]);
+
+  return (
+    <div className={`gen-ad ${className}`}>
+      <span>Publicidade</span>
+      <ins
+        className="adsbygoogle"
+        data-ad-client={ADSENSE_CLIENT || undefined}
+        data-ad-slot={slot || undefined}
+        data-ad-format={format === "auto" ? "auto" : undefined}
+        data-full-width-responsive={format === "auto" ? "true" : undefined}
+        aria-hidden={!ADSENSE_CLIENT || !slot}
+      />
+    </div>
+  );
+}
 
 // Tela de geracao de jogos da Mega-Sena: monta os filtros estatisticos e delega a geracao a API.
 export function GeneratorMegaSena() {
@@ -310,9 +355,11 @@ export function GeneratorMegaSena() {
 
   return (
     <section className="page gen-page">
-      <Link to="/dashboard/lotofacil" className="gen-back-link">
-        <ArrowLeft size={16} /> Voltar para o início
+      <Link to="/dashboard/mega-sena" className="gen-back-link">
+        <ArrowLeft size={16} /> Voltar para o painel
       </Link>
+
+      <AdSpace slot={ADSENSE_SLOTS.leaderboard} format="728x90" className="gen-ad--leaderboard" />
 
       <section className="gen-filters" aria-label="Filtros matemáticos">
         <div className="gen-filters-head">
@@ -607,6 +654,14 @@ export function GeneratorMegaSena() {
           </div>
         )}
       </section>
+
+      <AdSpace slot={ADSENSE_SLOTS.responsive} format="auto" className="gen-ad--responsive" />
+
+      <aside className="gen-ad-rail" aria-label="Publicidade e assinatura">
+        <AdSpace slot={ADSENSE_SLOTS.rectangle} format="300x250" className="gen-ad--rectangle" />
+        <AdSpace slot={ADSENSE_SLOTS.halfPage} format="300x600" className="gen-ad--half-page" />
+        <AdSpace slot={ADSENSE_SLOTS.sidebarExtra} format="300x250" className="gen-ad--rectangle" />
+      </aside>
     </section>
   );
 }
