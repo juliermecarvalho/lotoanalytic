@@ -623,6 +623,11 @@
   grid-template-columns: repeat(10, 34px);
 }
 
+/* Volante da Quina: 80 dezenas dispostas em 10 colunas. */
+.gen-board--quina {
+  grid-template-columns: repeat(10, 34px);
+}
+
 .gen-cell {
   background: #ffffff;
   border: 1px solid #bcccdc;
@@ -1188,6 +1193,11 @@
 
   /* O volante da Mega-Sena mantem 10 colunas fluidas no mobile. */
   .gen-board--mega {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+  }
+
+  /* O volante da Quina mantem 10 colunas fluidas no mobile. */
+  .gen-board--quina {
     grid-template-columns: repeat(10, minmax(0, 1fr));
   }
 

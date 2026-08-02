@@ -16,7 +16,8 @@ public sealed class FilterStatisticsRefreshService(LotoAnalyticsDbContext dbCont
         new Dictionary<string, (BoardSpec, bool)>
         {
             ["lotofacil"] = (LotofacilGameGenerator.Board, true),
-            ["mega_sena"] = (MegaSenaGameGenerator.Board, false)
+            ["mega_sena"] = (MegaSenaGameGenerator.Board, false),
+            ["quina"] = (QuinaGameGenerator.Board, false)
         };
 
     // Recalcula e substitui as estatisticas de filtro da modalidade a partir dos concursos salvos.

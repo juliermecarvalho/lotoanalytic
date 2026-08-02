@@ -21,6 +21,13 @@ public sealed class LotofacilDashboardController(LotoAnalyticsDbContext dbContex
                 PreferredSumLowerBound = 150,
                 PreferredSumUpperBound = 210,
                 IncludeGrid = false
+            },
+            ["quina"] = new()
+            {
+                Board = QuinaGameGenerator.Board,
+                PreferredSumLowerBound = 165,
+                PreferredSumUpperBound = 240,
+                IncludeGrid = false
             }
         };
 

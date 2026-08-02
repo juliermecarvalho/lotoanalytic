@@ -11,6 +11,7 @@ import {
 import {
   ChevronDown,
   Dices,
+  Grid3x3,
   LayoutDashboard,
   LogOut,
   RefreshCw,
@@ -36,9 +37,11 @@ import { AppState, AppStateContext, useAppState } from "./lib/appState";
 import { AuthService, AuthSession, keycloakAuthService } from "./lib/auth";
 import { GeneratorLotofacil } from "./features/generator/GeneratorLotofacil";
 import { GeneratorMegaSena } from "./features/generator/GeneratorMegaSena";
+import { GeneratorQuina } from "./features/generator/GeneratorQuina";
 import { PrivacyPolicyPage } from "./features/legal/PrivacyPolicyPage";
 import { DashboardLotofacil } from "./features/dashboard/DashboardLotofacil";
 import { DashboardMegaSena } from "./features/dashboard/DashboardMegaSena";
+import { DashboardQuina } from "./features/dashboard/DashboardQuina";
 import { AdBlockGate } from "./features/adblock/AdBlockGate";
 import "./styles.css";
 
@@ -103,6 +106,11 @@ function createAppRouter() {
     path: "/dashboard/mega-sena",
     component: DashboardMegaSena
   });
+  const dashboardQuinaRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/dashboard/quina",
+    component: DashboardQuina
+  });
   const generatorRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/gerar-jogos/lotofacil",
@@ -112,6 +120,11 @@ function createAppRouter() {
     getParentRoute: () => rootRoute,
     path: "/gerar-jogos/mega-sena",
     component: GeneratorMegaSena
+  });
+  const generatorQuinaRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/gerar-jogos/quina",
+    component: GeneratorQuina
   });
   const legacyGeneratorRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -173,8 +186,10 @@ function createAppRouter() {
   const routeTree = rootRoute.addChildren([
     dashboardLotofacilRoute,
     dashboardMegaSenaRoute,
+    dashboardQuinaRoute,
     generatorRoute,
     generatorMegaSenaRoute,
+    generatorQuinaRoute,
     legacyGeneratorRoute,
     checkerRoute,
     historyRoute,
@@ -259,6 +274,9 @@ function Shell() {
           </Link>
           <Link to="/dashboard/mega-sena" activeProps={{ className: "active" }}>
             <Dices size={18} /> Mega-Sena
+          </Link>
+          <Link to="/dashboard/quina" activeProps={{ className: "active" }}>
+            <Grid3x3 size={18} /> Quina
           </Link>
         </nav>
       </aside>

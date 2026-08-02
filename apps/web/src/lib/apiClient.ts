@@ -81,6 +81,22 @@ export type GenerateMegaSenaGamesResponse = {
   combinacoesTestadas: number;
 };
 
+// Jogo gerado da Quina: sem moldura (a cartela 10x8 nao tem esse conceito).
+export type GeneratedQuinaGame = {
+  dezenas: string[];
+  quantidadePares: number;
+  quantidadeImpares: number;
+  somaDezenas: number;
+  quantidadeRepetidas: number;
+  quantidadePrimos: number;
+  maiorSequencia: number;
+};
+
+export type GenerateQuinaGamesResponse = {
+  jogos: GeneratedQuinaGame[];
+  combinacoesTestadas: number;
+};
+
 export type CheckGamesRequest = {
   dezenasSorteadas: string[];
   jogos: string[][];
