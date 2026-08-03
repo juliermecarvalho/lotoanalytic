@@ -37,6 +37,7 @@ import {
   parseNumbers
 } from "./lib/apiClient";
 import { AppState, AppStateContext, useAppState } from "./lib/appState";
+import { useRouteSeo } from "./lib/seo";
 import { AuthService, AuthSession, keycloakAuthService } from "./lib/auth";
 import { GeneratorLotofacil } from "./features/generator/GeneratorLotofacil";
 import { GeneratorMegaSena } from "./features/generator/GeneratorMegaSena";
@@ -281,6 +282,7 @@ function BrandLogo() {
 function Shell() {
   const { state, setState, authService } = useAppState();
   const isAdmin = hasRole(state.currentUser, "administrador");
+  useRouteSeo();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
 

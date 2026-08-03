@@ -1,4 +1,14 @@
+# robots.txt - lotoanalytic.com.br
+# Libera o rastreamento completo do site e bloqueia apenas rotas de sistema/privadas.
 User-agent: *
 Allow: /
+
+# Rotas de sistema/privadas do app React (nao devem ser indexadas).
+Disallow: /admin/
+Disallow: /adm/
+Disallow: /perfil
+Disallow: /concursos/
+Disallow: /auth/
+Disallow: /api/
 
 Sitemap: https://lotoanalytic.com.br/sitemap.xml

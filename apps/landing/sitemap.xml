@@ -5,16 +5,72 @@
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- Geradores de jogos por modalidade -->
   <url>
     <loc>https://lotoanalytic.com.br/gerar-jogos/lotofacil</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://lotoanalytic.com.br/gerar-jogos/mega-sena</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://lotoanalytic.com.br/gerar-jogos/quina</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://lotoanalytic.com.br/gerar-jogos/dupla-sena</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://lotoanalytic.com.br/gerar-jogos/lotomania</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://lotoanalytic.com.br/gerar-jogos/mais-milionaria</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Dashboards de estatisticas por modalidade -->
+  <url>
     <loc>https://lotoanalytic.com.br/dashboard/lotofacil</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
+  <url>
+    <loc>https://lotoanalytic.com.br/dashboard/mega-sena</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://lotoanalytic.com.br/dashboard/quina</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://lotoanalytic.com.br/dashboard/dupla-sena</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://lotoanalytic.com.br/dashboard/lotomania</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://lotoanalytic.com.br/dashboard/mais-milionaria</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Paginas de servico -->
   <url>
     <loc>https://lotoanalytic.com.br/conferidor</loc>
     <changefreq>weekly</changefreq>
